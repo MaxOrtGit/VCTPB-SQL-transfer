@@ -1,0 +1,1 @@
+{"blurple": "7289da", "teal": "1abc9c", "green": "2ecc71", "twitch purple": "9146ff", "pale yellow": "ffffbf", "almost black": "070d0d", "dark grey": "997570", "black": "000000", "cool green": "15b01a"}
