@@ -27,9 +27,9 @@ def create_db():
     Column('winner', Integer),
     Column('color', String(6)),
     Column('creator', Integer),
-    Column('date_created', DateTime),
-    Column('date_winner', DateTime),
-    Column('date_closed', DateTime),
+    Column('date_created', DateTime(timezone = True)),
+    Column('date_winner', DateTime(timezone = True)),
+    Column('date_closed', DateTime(timezone = True)),
     Column('bet_ids', String), #array of int 
     Column('message_ids', String), #array of int
   )
@@ -46,14 +46,14 @@ def create_db():
     Column('color', String(6)),
     Column('match_id', String(8)),
     Column('user_id', Integer),
-    Column('date_created', DateTime),
+    Column('date_created', DateTime(timezone = True)),
     Column('message_ids', String), #array of int
   )
   
   user = Table(
     "user", meta,
     Column('code', String(8), primary_key = True),
-    Column('username', String(25)),
+    Column('username', String(32)),
     Column('color', String(6)),
     Column('hidden', Boolean),
     Column('balances', String), #array of Tuple(bet_id, balance after change, date)

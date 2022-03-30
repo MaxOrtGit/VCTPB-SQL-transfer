@@ -1,8 +1,8 @@
 from dbinterface import get_from_list
 import math
-from sqlalchemy import create_engine, MetaData, Table, Column, Numeric, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, DateTime
+import jsonpickle
 from sqlalchemy.ext.declarative import declarative_base
-import pickle
 
 Base = declarative_base()
 
@@ -50,10 +50,10 @@ class Bet(Base):
 
 
   def get_message_ids(self):
-    return pickle.loads(self.message_ids)
+    return jsonpickle.decode(self.message_ids)
   
   def save_message_ids(self, message_ids):
-    self.message_ids = pickle.dumps(message_ids)
+    self.message_ids = jsonpickle.encode(message_ids)
   
 
   def to_string(self):
