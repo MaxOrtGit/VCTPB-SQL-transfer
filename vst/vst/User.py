@@ -13,23 +13,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-import sqlite3
-
-connection = sqlite3.connect('savedata.db')
-cursor = connection.cursor()
-
-cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-  code text,
-  username text,
-  color text,
-  show_on_lb int
-  balance blob,
-
-                  ''')
-
-class User(Base):
-
-  __tablename__ = 'users'
+class User:
 
   def __init__(self, code, username, color, date_created):
     self.code = code

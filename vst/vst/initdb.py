@@ -13,8 +13,8 @@ def create_db():
   engine = create_engine('sqlite:///savedata.db', echo = True)
   meta = MetaData()
 
-  matches = Table(
-    'matches', meta, 
+  match = Table(
+    'match', meta, 
     Column('code', String(8), primary_key = True),
     Column('t1', String(50)),
     Column('t2', String(50)),
@@ -34,8 +34,8 @@ def create_db():
     Column('message_ids', String), #array of int
   )
   
-  bets = Table(
-    'bets', meta, 
+  bet = Table(
+    'bet', meta, 
     Column('code', String(8), primary_key = True),
     Column('t1', String(50)),
     Column('t2', String(50)),
@@ -50,8 +50,8 @@ def create_db():
     Column('message_ids', String), #array of int
   )
   
-  users = Table(
-    "users", meta,
+  user = Table(
+    "user", meta,
     Column('code', String(8), primary_key = True),
     Column('username', String(25)),
     Column('color', String(6)),
