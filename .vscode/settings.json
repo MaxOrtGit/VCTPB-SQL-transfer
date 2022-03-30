@@ -1,14 +1,20 @@
 {
-    "actionButtons": {"
-        defaultColor": "#ff0034", // Can also use string color names.
+    "actionButtons": {
+        "defaultColor": "#ff0034", // Can also use string color names.
         "loadNpmCommands":false, // Disables automatic generation of actions for npm commands.
         "reloadButton":"♻️", // Custom reload button text or icon (default ↻). null value enables automatic reload on configuration change
         "commands": [
             {
-                "name": "Run main",
+                "name": "Run main python3",
                 "singleInstance": true,
                 "color": "orange",
-                "command": "cd vst\npython3 -m poetry run python3 vst/main.py",
+                "command": "cd vst\npython3 -m poetry run python3 vst/main.py"
+            },
+            {
+                "name": "Run main poetry",
+                "singleInstance": true,
+                "color": "orange",
+                "command": "cd vst\npoetry run python vst/main.py",
             },
         ]
     }
