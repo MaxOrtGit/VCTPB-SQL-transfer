@@ -1,28 +1,70 @@
 from dbinterface import get_from_list
 import math
+from sqlalchemy import Column, Integer, String, DateTime
+import jsonpickle
+from sqlalchemy.ext.declarative import declarative_base
 
-class Bet:
-  def __init__(self, code, match_id, user_id, bet_amount, team_num, date_created, t1, t2, tournament_name, color):
+Base = declarative_base()
+
+
+
+class Bet(Base):
+  
+  __tabelname__ = "bet"
+  
+  code = Column(String(8), primary_key = True)
+  t1 = Column(String(50))
+  t2 = Column(String(50))
+  tournament_name = Column(String(100))
+  winner = Column(Integer)
+  amount_bet = Column(Integer)
+  team_num = Column(Integer)
+  color = Column(String(6))
+  match_id = Column(String(8))
+  user_id = Column(Integer)
+  date_created = Column(DateTime)
+  message_ids = Column(String)
+  
+  
+  def __init__(self, code, t1, t2, tournament_name, amount_bet, team_num, color, match_id, user_id, date_created):
+    
+    self.code = code
     
     self.t1 = t1
     self.t2 = t2
     self.tournament_name = tournament_name
     
-    self.code = code
+    self.winner = 0
+    
+    self.amount_bet = amount_bet
+    self.team_num = team_num
+    
+    self.color = color
+    
     self.match_id = match_id
     self.user_id = user_id
-    self.bet_amount = bet_amount
-    self.team_num = int(team_num)
     self.date_created = date_created
 
-    self.color = color
     #team num of winner
-    self.winner = 0
     self.message_ids = []
-    
 
+  def __init__(self, code, t1, t2, tournament_name, winner, amount_bet, team_num, color, match_id, user_id, date_created, message_ids):
+      self.code = code
+      self.t1 = t1
+      self.t2 = t2
+      self.tournament_name = tournament_name
+      self.winner = winner
+      self.amount_bet = amount_bet
+      self.team_num = team_num
+      self.color = color
+      self.match_id = match_id
+      self.user_id = user_id
+      self.date_created = date_created
+      self.message_ids = message_ids
   
-
+  def save_message_ids(self, message_ids):
+    self.message_ids = jsonpickle.encode(message_ids)
+  
 
   def to_string(self):
     date_formatted = self.date_created.strftime("%d/%m/%Y at %H:%M:%S")
@@ -92,3 +134,30 @@ class Bet:
 
     return f"{match.t1} vs {match.t2}, Bet on: {team}, Winner: {winner}, Amount bet: {math.floor(self.bet_amount)}, Balance change: {math.floor(balance)}"
 
+def is_valid_bet(code, t1, t2, tournament_name, amount_bet, team_num, color, match_id, user_id, date_created):
+  errors = [False for _ in range(10)]
+  if len(code) != 8 or isinstance(code, str) == False:
+    errors[0] = True
+  if len(t1) > 50 or isinstance(t1, str) == False:
+    errors[1] = True
+  if len(t2) > 50 or isinstance(t2, str) == False:
+    errors[2] = True
+  if len(tournament_name) > 100 or isinstance(tournament_name, str) == False:
+    errors[3] = True
+  if isinstance(amount_bet, int) == False or amount_bet < 1:
+    errors[4] = True
+  if isinstance(team_num, int) == False or team_num < 1 or team_num > 2:
+    errors[5] = True
+  if len(color) > 6 or isinstance(color, str) == False:
+    errors[6] = True
+  if len(match_id) != 8 or isinstance(match_id, str) == False:
+    errors[7] = True
+  if isinstance(user_id, int) == False:
+    errors[8] = True
+  if isinstance(date_created, str) == False:
+    errors[9] = True
+
+  return errors
+  
+        
+    

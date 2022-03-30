@@ -9,9 +9,26 @@ import random
 import math
 import secrets
 import sys
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, Boolean
+
+Base = declarative_base()
 
 
-class User:
+class User(Base):
+
+  __tabelname__ = "bet"
+  
+  code = Column(String(8), primary_key=True)
+  username = Column(String(32))
+  color = Column(String(6))
+  hidden = Column(Boolean)
+  balances = Column(String), #array of Tuple(bet_id, balance after change, date)
+  active_bet_ids = Column(String), #array of strings code of active bets
+  loans = Column(String), #array of Tuple(balance, date created, date paid)
+  
+  
+  
   def __init__(self, code, username, color, date_created):
     self.code = code
     self.username = username

@@ -1,8 +1,17 @@
 from multiprocessing import connection
 from xmlrpc.client import Boolean
 from savefiles import get_setting
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, MetaData, Table, Column, Numeric, Integer, String, Boolean, DateTime
+from dbinterface import get_all_objects
+import jsonpickle
 
+from DBUser import User
+from DBMatch import Match
+from DBBet import Bet
+
+
+from sqltypes import JSONLIST
 
 def create_db():
   
@@ -30,8 +39,8 @@ def create_db():
     Column('date_created', DateTime(timezone = True)),
     Column('date_winner', DateTime(timezone = True)),
     Column('date_closed', DateTime(timezone = True)),
-    Column('bet_ids', String), #array of int 
-    Column('message_ids', String), #array of int
+    Column('bet_ids', JSONLIST), #list of int 
+    Column('message_ids', JSONLIST), #list of int
   )
   
   bet = Table(
@@ -47,7 +56,7 @@ def create_db():
     Column('match_id', String(8)),
     Column('user_id', Integer),
     Column('date_created', DateTime(timezone = True)),
-    Column('message_ids', String), #array of int
+    Column('message_ids', JSONLIST), #list of int
   )
   
   user = Table(
@@ -56,10 +65,22 @@ def create_db():
     Column('username', String(32)),
     Column('color', String(6)),
     Column('hidden', Boolean),
-    Column('balances', String), #array of Tuple(bet_id, balance after change, date)
-    Column('active_bet_ids', String), #array of strings code of active bets
-    Column('loans', String), #array of Tuple(balance, date created, date paid)
+    Column('balances', JSONLIST), #list of Tuple(bet_id, balance after change, date)
+    Column('active_bet_ids', JSONLIST), #list of strings code of active bets
+    Column('loans', JSONLIST), #list of Tuple(balance, date created, date paid)
   )
   
   meta.create_all(engine)
   
+
+
+def files_to_db():
+  
+  engine = create_engine('sqlite:///savedata.db')
+  session = sessionmaker(bind = engine)
+  
+  matches = get_all_objects("match")
+  for match in matches:
+    dbmatch = Match(match.code, match.t1, match.t2, match.t1o, match.t2o, match.t1oo, match.t2oo, match.tournament_name, match.winner, match.odds_source, match.color, match.creator, match.date_created, match.date_winner, match.date_closed, match.bet_ids, match.message_ids)
+    session.add(dbmatch)
+  session.commit()
