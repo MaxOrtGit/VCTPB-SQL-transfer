@@ -1,7 +1,7 @@
 from multiprocessing import connection
 from xmlrpc.client import Boolean
 from savefiles import get_setting
-from sqlalchemy import create_engine, MetaData, Table, Column, Numeric, Integer, String, Boolean, DateTime, ARRAY
+from sqlalchemy import create_engine, MetaData, Table, Column, Numeric, Integer, String, Boolean, DateTime
 
 
 def create_db():
