@@ -18,7 +18,7 @@ Base = declarative_base()
 
 class User(Base):
 
-  __tabelname__ = "bet"
+  __tablename__ = "bet"
   
   code = Column(String(8), primary_key=True)
   username = Column(String(32))

@@ -9,7 +9,7 @@ Base = declarative_base()
 
 class Match(Base):
   
-  __tabelname__ = "match"
+  __tablename__ = "match"
   
   code = Column(String(8), primary_key = True)
   t1 = Column(String(50))
@@ -42,9 +42,9 @@ class Match(Base):
 
     self.tournament_name = tournament_name
     
-    self.winner = 0
-    
     self.odds_source = odds_source
+    
+    self.winner = 0
 
     self.color = color
     
@@ -102,42 +102,59 @@ class Match(Base):
   
   
   
-def is_valid_match(code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, winner, odds_source, color, creator, date_created, date_winner, date_closed, bet_ids, message_ids):
+def is_valid_match(code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, odds_source, winner, color, creator, date_created, date_winner, date_closed, bet_ids, message_ids):
   errors = [False for _ in range(17)]
   if isinstance(code, str) == False or len(code) != 8:
     errors[0] = True
+    print("code", code, type(code))
   if isinstance(t1, str) == False or len(t1) > 50:
     errors[1] = True
+    print("t1", t1, type(t1))
   if isinstance(t2, str) == False or len(t2) > 50:
     errors[2] = True
-  if isinstance(tournament_name, str) == False or len(tournament_name) > 100:
-    errors[3] = True
+    print("t2", t2, type(t2))
   if isinstance(t1o, Decimal) == False or t1o < 0:
-    errors[4] = True
+    errors[3] = True
+    print("t1o", t1o, type(t1o))
   if isinstance(t2o, Decimal) == False or t2o < 0:
-    errors[5] = True
+    errors[4] = True
+    print("t2o", t2o, type(t2o))
   if isinstance(t1oo, Decimal) == False or t1oo < 0:
-    errors[6] = True
+    errors[5] = True
+    print("t1oo", t1oo, type(t1oo))
   if isinstance(t2oo, Decimal) == False or t2oo < 0:
+    errors[6] = True
+    print("t2oo", t2oo, type(t2oo))
+  if isinstance(tournament_name, str) == False or len(tournament_name) > 100:
     errors[7] = True
-  if isinstance(winner, int) == False or winner < 0 or winner > 2:
+    print("tournament_name", tournament_name, type(tournament_name))
+  if isinstance(odds_source, str) == False or len(odds_source) > 50:
     errors[8] = True
-  if isinstance(odds_source, String) == False or len(odds_source) > 50:
+    print("odds_source", odds_source, type(odds_source))
+  if isinstance(winner, int) == False or winner < 0 or winner > 2:
     errors[9] = True
+    print("winner", winner, type(winner))
   if isinstance(color, str) == False or len(color) > 6:
     errors[10] = True
+    print("color", color, type(color))
   if isinstance(creator, int) == False:
     errors[11] = True
+    print("creator", creator, type(creator))
   if isinstance(date_created, datetime) == False:
     errors[12] = True
+    print("date_created", date_created, type(date_created))
   if isinstance(date_winner, datetime) == False:
     errors[13] = True
+    print("date_winner", date_winner, type(date_winner))
   if isinstance(date_closed, datetime) == False:
     errors[14] = True
+    print("date_closed", date_closed, type(date_closed))
   if isinstance(bet_ids, list) == False:
     errors[15] = True
+    print("bet_ids", bet_ids, type(bet_ids))
   if isinstance(message_ids, list) == False:
     errors[16] = True
+    print("message_ids", message_ids, type(message_ids))
 
   return errors
 

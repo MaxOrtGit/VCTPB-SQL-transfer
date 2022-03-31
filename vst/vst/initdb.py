@@ -1,3 +1,4 @@
+from decimal import Decimal
 from multiprocessing import connection
 from xmlrpc.client import Boolean
 from savefiles import get_setting
@@ -77,11 +78,16 @@ def create_db():
 def files_to_db():
   
   engine = create_engine('sqlite:///savedata.db')
-  session = sessionmaker(bind = engine)
+  session = sessionmaker(bind = engine)()
   
   matches = get_all_objects("match")
   for match in matches:
-    errors = is_valid_match(match.code, match.t1, match.t2, match.t1o, match.t2o, match.t1oo, match.t2oo, match.tournament_name, match.winner, match.odds_source, match.color, match.creator, match.date_created, match.date_winner, match.date_closed, match.bet_ids, match.message_ids)
+    match.t1o = Decimal(str(match.t1o))
+    match.t2o = Decimal(str(match.t2o))
+    match.t1oo = Decimal(str(match.t1oo))
+    match.t2oo = Decimal(str(match.t2oo))
+    
+    errors = is_valid_match(match.code, match.t1, match.t2, match.t1o, match.t2o, match.t1oo, match.t2oo, match.tournament_name, match.odds_source, match.winner, match.color, match.creator, match.date_created, match.date_winner, match.date_closed, match.bet_ids, match.message_ids)
     error = False
     for e in errors:
       if e:
@@ -89,8 +95,11 @@ def files_to_db():
     if error:
       print("Error in match:", match.code)
       print(jsonpickle.encode(match))
+      print(list(enumerate(errors)))
+      print(list(enumerate([match.code, match.t1, match.t2, match.t1o, match.t2o, match.t1oo, match.t2oo, match.tournament_name, match.odds_source, match.winner, match.color, match.creator, match.date_created, match.date_winner, match.date_closed, match.bet_ids, match.message_ids])))
       return
     
     dbmatch = Match(match.code, match.t1, match.t2, match.t1o, match.t2o, match.t1oo, match.t2oo, match.tournament_name, match.winner, match.odds_source, match.color, match.creator, match.date_created, match.date_winner, match.date_closed, match.bet_ids, match.message_ids)
     session.add(dbmatch)
+    
   session.commit()

@@ -11,7 +11,7 @@ Base = declarative_base()
 
 class Bet(Base):
   
-  __tabelname__ = "bet"
+  __tablename__ = "bet"
   
   code = Column(String(8), primary_key = True)
   t1 = Column(String(50))
