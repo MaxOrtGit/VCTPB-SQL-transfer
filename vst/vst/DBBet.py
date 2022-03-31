@@ -3,7 +3,8 @@ import math
 from sqlalchemy import Column, Integer, String, DateTime
 import jsonpickle
 from sqlalchemy.ext.declarative import declarative_base
-
+from sqltypes import JSONLIST
+from datetime import datetime
 Base = declarative_base()
 
 
@@ -23,7 +24,7 @@ class Bet(Base):
   match_id = Column(String(8))
   user_id = Column(Integer)
   date_created = Column(DateTime)
-  message_ids = Column(String)
+  message_ids = Column(JSONLIST)
   
   
   def __init__(self, code, t1, t2, tournament_name, amount_bet, team_num, color, match_id, user_id, date_created):
@@ -62,13 +63,11 @@ class Bet(Base):
       self.date_created = date_created
       self.message_ids = message_ids
   
-  def save_message_ids(self, message_ids):
-    self.message_ids = jsonpickle.encode(message_ids)
   
 
   def to_string(self):
     date_formatted = self.date_created.strftime("%d/%m/%Y at %H:%M:%S")
-    return "Match ID: " + str(self.match_id) + ", User ID: " + str(self.user_id) + ", Amount Bet: " + str(self.bet_amount) + ", Team Bet On: " + str(self.team_num) + ", Date Created: " + str(date_formatted) + ", Date Closed: " + str(self.date_closed) + ", Winner: " + str(self.winner) + ", Identifyer: " + str(self.code) + ", Message IDs: " + str(self.message_ids)
+    return "Match ID: " + str(self.match_id) + ", User ID: " + str(self.user_id) + ", Amount Bet: " + str(self.amount_bet) + ", Team Bet On: " + str(self.team_num) + ", Date Created: " + str(date_formatted) + ", Date Closed: " + str(self.date_closed) + ", Winner: " + str(self.winner) + ", Identifyer: " + str(self.code) + ", Message IDs: " + str(self.message_ids)
 
   
   
@@ -89,10 +88,10 @@ class Bet(Base):
     print()
     if self.team_num == 1:
       team = match.t1
-      payout = self.bet_amount * match.t1o - self.bet_amount
+      payout = self.amount_bet * match.t1o - self.amount_bet
     elif self.team_num == 2:
       team = match.t2
-      payout = self.bet_amount * match.t2o - self.bet_amount
+      payout = self.amount_bet * match.t2o - self.amount_bet
 
     return(team, payout)
 
@@ -119,45 +118,45 @@ class Bet(Base):
     
     (team, payout) = self.get_team_and_payout()
 
-    return f"User: <@!{self.user_id}>, Team: {team}, Amount: {self.bet_amount}, Payout: {int(math.floor(payout))}"
+    return f"User: <@!{self.user_id}>, Team: {team}, Amount: {self.amount_bet}, Payout: {int(math.floor(payout))}"
 
   async def basic_to_string(self, bot, match=None):
     if match is None:
       match = get_from_list("match", self.match_id)
 
-    return f"Bet: {self.code}, User: <@!{self.user_id}>, Team: {self.get_team()}, Amount: {self.bet_amount}, Match ID: {match.code}"
+    return f"Bet: {self.code}, User: <@!{self.user_id}>, Team: {self.get_team()}, Amount: {self.amount_bet}, Match ID: {match.code}"
   
   def balance_to_string(self, balance):
     
     match = get_from_list("match", self.match_id)
     (team, winner) = self.get_team_and_winner()
 
-    return f"{match.t1} vs {match.t2}, Bet on: {team}, Winner: {winner}, Amount bet: {math.floor(self.bet_amount)}, Balance change: {math.floor(balance)}"
+    return f"{match.t1} vs {match.t2}, Bet on: {team}, Winner: {winner}, Amount bet: {math.floor(self.amount_bet)}, Balance change: {math.floor(balance)}"
 
-def is_valid_bet(code, t1, t2, tournament_name, amount_bet, team_num, color, match_id, user_id, date_created):
-  errors = [False for _ in range(10)]
-  if len(code) != 8 or isinstance(code, str) == False:
+def is_valid_bet(code, t1, t2, tournament_name, winner, amount_bet, team_num, color, match_id, user_id, date_created, message_ids):
+  errors = [False for _ in range(12)]
+  if isinstance(code, str) == False or len(code) != 8:
     errors[0] = True
-  if len(t1) > 50 or isinstance(t1, str) == False:
+  if isinstance(t1, str) == False or len(t1) > 50:
     errors[1] = True
-  if len(t2) > 50 or isinstance(t2, str) == False:
+  if isinstance(t2, str) == False or len(t2) > 50:
     errors[2] = True
-  if len(tournament_name) > 100 or isinstance(tournament_name, str) == False:
+  if isinstance(tournament_name, str) == False or len(tournament_name) > 100:
     errors[3] = True
-  if isinstance(amount_bet, int) == False or amount_bet < 1:
+  if isinstance(winner, int) == False:
     errors[4] = True
-  if isinstance(team_num, int) == False or team_num < 1 or team_num > 2:
+  if isinstance(amount_bet, int) == False:
     errors[5] = True
-  if len(color) > 6 or isinstance(color, str) == False:
+  if isinstance(team_num, int) == False:
     errors[6] = True
-  if len(match_id) != 8 or isinstance(match_id, str) == False:
+  if isinstance(color, str) or len(color) != 6 == False:
     errors[7] = True
-  if isinstance(user_id, int) == False:
+  if isinstance(match_id, str) == False or len(match_id) != 8:
     errors[8] = True
-  if isinstance(date_created, str) == False:
+  if isinstance(user_id, int) == False:
     errors[9] = True
-
+  if isinstance(date_created, datetime) == False:
+    errors[10] = True
+  if isinstance(message_ids, list) == False:
+    errors[11] = True
   return errors
-  
-        
-    

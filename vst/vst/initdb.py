@@ -6,9 +6,9 @@ from sqlalchemy import create_engine, MetaData, Table, Column, Numeric, Integer,
 from dbinterface import get_all_objects
 import jsonpickle
 
-from DBUser import User
-from DBMatch import Match
-from DBBet import Bet
+from DBUser import User, is_valid_user
+from DBMatch import Match, is_valid_match
+from DBBet import Bet, is_valid_bet
 
 
 from sqltypes import JSONLIST
@@ -81,6 +81,16 @@ def files_to_db():
   
   matches = get_all_objects("match")
   for match in matches:
+    errors = is_valid_match(match.code, match.t1, match.t2, match.t1o, match.t2o, match.t1oo, match.t2oo, match.tournament_name, match.winner, match.odds_source, match.color, match.creator, match.date_created, match.date_winner, match.date_closed, match.bet_ids, match.message_ids)
+    error = False
+    for e in errors:
+      if e:
+        error = True
+    if error:
+      print("Error in match:", match.code)
+      print(jsonpickle.encode(match))
+      return
+    
     dbmatch = Match(match.code, match.t1, match.t2, match.t1o, match.t2o, match.t1oo, match.t2oo, match.tournament_name, match.winner, match.odds_source, match.color, match.creator, match.date_created, match.date_winner, match.date_closed, match.bet_ids, match.message_ids)
     session.add(dbmatch)
   session.commit()

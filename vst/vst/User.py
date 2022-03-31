@@ -85,7 +85,7 @@ class User:
           self.active_bet_ids.remove(id)
         replace_in_list("user", self.code, self)
         continue
-      used += temp_bet.bet_amount
+      used += temp_bet.amount_bet
 
     return used
 

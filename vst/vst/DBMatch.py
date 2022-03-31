@@ -3,7 +3,8 @@ from decimal import Decimal
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Table, Column, Numeric, Integer, String, DateTime
 import jsonpickle
-
+from datetime import datetime
+from sqltypes import JSONLIST
 Base = declarative_base()
 
 class Match(Base):
@@ -25,8 +26,8 @@ class Match(Base):
   date_created = Column(DateTime(timezone = True))
   date_winner = Column(DateTime(timezone = True))
   date_closed = Column(DateTime(timezone = True))
-  bet_ids = Column(String) #array of int
-  message_ids = Column(String) #array of int
+  bet_ids = Column(JSONLIST) #array of int
+  message_ids = Column(JSONLIST) #array of int
   
   def __init__(self, code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, odds_source, color, creator, date_created):
 
@@ -56,8 +57,8 @@ class Match(Base):
     self.date_closed = None
     
     
-    self.bet_ids = jsonpickle.encode([])
-    self.message_ids = jsonpickle.encode([])
+    self.bet_ids = []
+    self.message_ids = []
   
   def __init__(self, code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, winner, odds_source, color, creator, date_created, date_winner, date_closed, bet_ids, message_ids):
     self.code = code
@@ -79,17 +80,6 @@ class Match(Base):
     self.message_ids = message_ids
   
   
-  def get_bet_ids(self):
-    return jsonpickle.decode(self.bet_ids)
-
-  def get_message_ids(self):
-    return jsonpickle.decode(self.message_ids)
-  
-  def set_bet_ids(self, bet_ids):
-    self.bet_ids = jsonpickle.encode(bet_ids)
-
-  def set_message_ids(self, message_ids):
-    self.message_ids = jsonpickle.encode(message_ids)
   
   def to_string(self):
     date_formatted = self.date_created.strftime("%d/%m/%Y at %H:%M:%S")
@@ -110,40 +100,17 @@ class Match(Base):
   def basic_to_string(self):
     return f"Match: {self.code}, Teams: {self.t1} vs {self.t2}, Odds: {self.t1o} vs {self.t2o}, Tournament Name: {self.tournament_name}"
   
-def is_valid_bet(code, t1, t2, tournament_name, amount_bet, team_num, color, match_id, user_id, date_created):
-  errors = [False for _ in range(10)]
-  if len(code) != 8 or isinstance(code, str) == False:
-    errors[0] = True
-  if len(t1) > 50 or isinstance(t1, str) == False:
-    errors[1] = True
-  if len(t2) > 50 or isinstance(t2, str) == False:
-    errors[2] = True
-  if len(tournament_name) > 100 or isinstance(tournament_name, str) == False:
-    errors[3] = True
-  if isinstance(amount_bet, int) == False or amount_bet < 1:
-    errors[4] = True
-  if isinstance(team_num, int) == False or team_num < 1 or team_num > 2:
-    errors[5] = True
-  if len(color) > 6 or isinstance(color, str) == False:
-    errors[6] = True
-  if len(match_id) != 8 or isinstance(match_id, str) == False:
-    errors[7] = True
-  if isinstance(user_id, int) == False:
-    errors[8] = True
-  if isinstance(date_created, str) == False:
-    errors[9] = True
-
-  return errors
+  
   
 def is_valid_match(code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, winner, odds_source, color, creator, date_created, date_winner, date_closed, bet_ids, message_ids):
   errors = [False for _ in range(17)]
-  if len(code) != 8 or isinstance(code, str) == False:
+  if isinstance(code, str) == False or len(code) != 8:
     errors[0] = True
-  if len(t1) > 50 or isinstance(t1, str) == False:
+  if isinstance(t1, str) == False or len(t1) > 50:
     errors[1] = True
-  if len(t2) > 50 or isinstance(t2, str) == False:
+  if isinstance(t2, str) == False or len(t2) > 50:
     errors[2] = True
-  if len(tournament_name) > 100 or isinstance(tournament_name, str) == False:
+  if isinstance(tournament_name, str) == False or len(tournament_name) > 100:
     errors[3] = True
   if isinstance(t1o, Decimal) == False or t1o < 0:
     errors[4] = True
@@ -155,17 +122,17 @@ def is_valid_match(code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, winner, 
     errors[7] = True
   if isinstance(winner, int) == False or winner < 0 or winner > 2:
     errors[8] = True
-  if isinstance(odds_source, ) == False :
+  if isinstance(odds_source, String) == False or len(odds_source) > 50:
     errors[9] = True
-  if len(color) > 6 or isinstance(color, str) == False:
+  if isinstance(color, str) == False or len(color) > 6:
     errors[10] = True
   if isinstance(creator, int) == False:
     errors[11] = True
-  if isinstance(date_created, str) == False:
+  if isinstance(date_created, datetime) == False:
     errors[12] = True
-  if isinstance(date_winner, str) == False:
+  if isinstance(date_winner, datetime) == False:
     errors[13] = True
-  if isinstance(date_closed, str) == False:
+  if isinstance(date_closed, datetime) == False:
     errors[14] = True
   if isinstance(bet_ids, list) == False:
     errors[15] = True
@@ -174,20 +141,3 @@ def is_valid_match(code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, winner, 
 
   return errors
 
-code = Column(String(8), primary_key = True)
-t1 = Column(String(50))
-t2 = Column(String(50))
-t1o = Column(Numeric(5, 3))
-t2o = Column(Numeric(5, 3))
-t1oo = Column(Numeric(5, 3))
-t2oo = Column(Numeric(5, 3))
-tournament_name = Column(String(100))
-odds_source = Column(String(50))
-winner = Column(Integer)
-color = Column(String(6))
-creator = Column(Integer)
-date_created = Column(DateTime(timezone = True))
-date_winner = Column(DateTime(timezone = True))
-date_closed = Column(DateTime(timezone = True))
-bet_ids = Column(String) #array of int
-message_ids = Column(String) #array of int

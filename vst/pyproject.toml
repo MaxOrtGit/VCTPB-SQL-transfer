@@ -1,17 +1,21 @@
 [tool.poetry]
-name = "vst"
+name = "repl_python3_VCT-Beta-Predictions-Bot"
 version = "0.1.0"
 description = ""
-authors = ["MaxOrtGit <maxrort@gmail.com>"]
+authors = ["MaxOrtman <<>>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-pytz = "^2022.1"
+python = "^3.8"
+pytz = "^2021.3"
+replit = "^3.2.4"
+emoji = "^1.7.0"
 jsonpickle = "^2.1.0"
-SQLAlchemy = "^1.4.32"
+py-cord = "2.0.0b5"
+PyGithub = "^1.55"
+APScheduler = "^3.9.1"
+matplotlib = "^3.5.1"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
