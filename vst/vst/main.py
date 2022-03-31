@@ -19,5 +19,3 @@ else:
     quit()
 
 
-
-#import sqlinterface

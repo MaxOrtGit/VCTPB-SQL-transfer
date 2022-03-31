@@ -1,15 +1,11 @@
 from dbinterface import get_from_list
 import math
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, create_engine
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-import jsonpickle
-from sqlalchemy.ext.declarative import declarative_base
 from sqltypes import JSONLIST
 from datetime import datetime
 
-from base import Base
-
-engine = create_engine('sqlite:///savedata.db')
+from sqlaobjs import Base
 
 class Bet(Base):
   

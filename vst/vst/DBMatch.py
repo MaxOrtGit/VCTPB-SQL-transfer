@@ -1,15 +1,11 @@
-
 from decimal import Decimal
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, Column, Integer, String, DateTime, ForeignKey, create_engine
+from sqlalchemy import Table, Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-import jsonpickle
 from datetime import datetime
 from sqltypes import JSONLIST, DECIMAL
 
-from base import Base
+from sqlaobjs import Base
 
-engine = create_engine('sqlite:///savedata.db')
 
 class Match(Base):
   

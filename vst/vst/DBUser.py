@@ -9,14 +9,11 @@ import random
 import math
 import secrets
 import sys
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, BOOLEAN, create_engine
+from sqlalchemy import Column, String, BOOLEAN
 from sqlalchemy.orm import relationship
 from sqltypes import JSONLIST
 
-from base import Base
-
-engine = create_engine('sqlite:///savedata.db')
+from sqlaobjs import Base
 
 class User(Base):
   __tablename__ = "user"
