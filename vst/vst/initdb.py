@@ -3,16 +3,16 @@ from multiprocessing import connection
 from xmlrpc.client import Boolean
 from savefiles import get_setting
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean, DateTime
+from sqlalchemy import create_engine
 from dbinterface import get_all_objects
 import jsonpickle
 from sqlalchemy.exc import IntegrityError 
 
+import base
+
 from DBUser import User, is_valid_user
 from DBMatch import Match, is_valid_match
 from DBBet import Bet, is_valid_bet
-
-from sqltypes import JSONLIST, DECIMAL
 
 def create_db():
   
@@ -21,60 +21,9 @@ def create_db():
     quit()
 
   engine = create_engine('sqlite:///savedata.db')
-  meta = MetaData()
-
-  match = Table(
-    'match', meta, 
-    Column('code', String(8), primary_key = True, nullable=False),
-    Column('t1', String(50), nullable=False),
-    Column('t2', String(50), nullable=False),
-    Column('t1o', DECIMAL(5, 3), nullable=False),
-    Column('t2o', DECIMAL(5, 3), nullable=False),
-    Column('t1oo', DECIMAL(5, 3), nullable=False),
-    Column('t2oo', DECIMAL(5, 3), nullable=False),
-    Column('tournament_name', String(100), nullable=False),
-    Column('odds_source', String(50), nullable=False),
-    Column('winner', Integer, nullable=False),
-    Column('color', String(6), nullable=False),
-    Column('creator', Integer, nullable=False),
-    Column('date_created', DateTime(timezone = True), nullable=False),
-    Column('date_winner', DateTime(timezone = True), nullable=False),
-    Column('date_closed', DateTime(timezone = True), nullable=False),
-    Column('bets', String, nullable=False),
-    Column('message_ids', JSONLIST, nullable=False) #list of int
-  )
+  base.Base.metadata.create_all(engine, checkfirst=True)
   
-  bet = Table(
-    'bet', meta, 
-    Column('code', String(8), primary_key = True, nullable=False),
-    Column('t1', String(50), nullable=False),
-    Column('t2', String(50), nullable=False),
-    Column('tournament_name', String(100), nullable=False),
-    Column('winner', Integer, nullable=False),
-    Column('amount_bet', Integer, nullable=False),
-    Column('team_num', Integer, nullable=False),
-    Column('color', String(6), nullable=False),
-    Column('match', String, nullable=False),
-    Column('user', Integer, nullable=False),
-    Column('bets', String, nullable=False),
-    Column('date_created', DateTime(timezone = True), nullable=False),
-    Column('message_ids', JSONLIST, nullable=False) #list of int
-  )
   
-  user = Table(
-    "user", meta,
-    Column('code', String(8), primary_key = True, nullable=False),
-    Column('username', String(32), nullable=False),
-    Column('color', String(6), nullable=False),
-    Column('hidden', Boolean, nullable=False),
-    Column('balances', JSONLIST, nullable=False), #list of Tuple(bet_id, balance after change, date)
-    Column('active_bet_ids', JSONLIST, nullable=False), #list of strings code of active bets
-    Column('loans', JSONLIST, nullable=False) #list of Tuple(balance, date created, date paid)
-  )
-  
-  meta.create_all(engine)
-  
-
 
 def files_to_db():
   
@@ -156,27 +105,43 @@ def files_to_db():
   
   
   matchess = session.query(Match).all()
-  mresult = [m.code for m in matchess]
+  mbets = [m.bets for m in matchess]
+  mcreator = [m.creator for m in matchess]
   
-  print(len(matches))
-  print(len(matchess))
-  print(mresult)
+  #print(mbets)
+  #print(mcreator)
   
   betss = session.query(Bet).all()
-  bresult = [b.code for b in betss]
+  bcodes = [b.code for b in betss]
+  bmatch = [b.match for b in betss]
+  buser = [b.user for b in betss]
   
-  print(len(bets))
-  print(len(betss))
-  print(bresult)
+  #print(bmatch)
+  #print(buser)
+  
+  #print(bresult)
   
   userss = session.query(User).all()
-  uresult = [u.code for u in userss]
+  ucodes = [u.code for u in userss]
+  ubets = [u.bets for u in userss]
+  umatches = [u.matches for u in userss]
   
-  print(len(users))
-  print(len(userss))
-  print(uresult)
+  #print(ubets)
+  #print(umatches)
+  #print(uresult)
   
   
   
+  print("\n\nmatchs bets, bets match")
+  #print(mbets)
+  #print(bmatch)
   
+  
+  print("\n\nuser bets, bets user")
+  #print(ubets)
+  #print(buser)
+  
+  print("\n\nuser matches, matches user")
+  #print(umatches)
+  #print(mcreator)
   

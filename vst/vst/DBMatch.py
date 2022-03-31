@@ -1,36 +1,40 @@
 
 from decimal import Decimal
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, Column, Integer, String, DateTime
+from sqlalchemy import Table, Column, Integer, String, DateTime, ForeignKey, create_engine
 from sqlalchemy.orm import relationship
 import jsonpickle
 from datetime import datetime
 from sqltypes import JSONLIST, DECIMAL
-Base = declarative_base()
+
+from base import Base
+
+engine = create_engine('sqlite:///savedata.db')
 
 class Match(Base):
   
   __tablename__ = "match"
   
-  code = Column(String(8), primary_key = True)
-  t1 = Column(String(50))
-  t2 = Column(String(50))
-  t1o = Column(DECIMAL(5, 3))
-  t2o = Column(DECIMAL(5, 3))
-  t1oo = Column(DECIMAL(5, 3))
-  t2oo = Column(DECIMAL(5, 3))
-  tournament_name = Column(String(100))
-  odds_source = Column(String(50))
-  winner = Column(Integer)
-  color = Column(String(6))
-  creator = Column(Integer)
-  date_created = Column(DateTime(timezone = True))
-  date_winner = Column(DateTime(timezone = True))
-  date_closed = Column(DateTime(timezone = True))
-  bets = relationship('Bet')
-  message_ids = Column(JSONLIST) #array of int
+  code = Column(String(8), primary_key = True, nullable=False)
+  t1 = Column(String(50), nullable=False)
+  t2 = Column(String(50), nullable=False)
+  t1o = Column(DECIMAL(5, 3), nullable=False)
+  t2o = Column(DECIMAL(5, 3), nullable=False)
+  t1oo = Column(DECIMAL(5, 3), nullable=False)
+  t2oo = Column(DECIMAL(5, 3), nullable=False)
+  tournament_name = Column(String(100), nullable=False)
+  odds_source = Column(String(50), nullable=False)
+  winner = Column(Integer, nullable=False)
+  color = Column(String(6), nullable=False)
+  creator_id = Column(Integer, ForeignKey("user.code"), nullable=False)
+  creator = relationship("User", back_populates="matches")
+  date_created = Column(DateTime(timezone = True), nullable=False)
+  date_winner = Column(DateTime(timezone = True), nullable=False)
+  date_closed = Column(DateTime(timezone = True), nullable=False)
+  bets = relationship("Bet", back_populates="match", cascade="all, delete")
+  message_ids = Column(JSONLIST, nullable=False) #array of int
   
-  def __init__(self, code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, odds_source, color, creator, date_created):
+  def __init__(self, code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, odds_source, color, creator_id, date_created):
 
 
     self.code = code
@@ -50,7 +54,7 @@ class Match(Base):
     self.color = color
     
     #id of user that created match
-    self.creator = creator
+    self.creator_id = creator_id
 
     self.date_created = date_created
 
@@ -61,7 +65,7 @@ class Match(Base):
     self.bet_ids = []
     self.message_ids = []
   
-  def __init__(self, code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, winner, odds_source, color, creator, date_created, date_winner, date_closed, bet_ids, message_ids):
+  def __init__(self, code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, winner, odds_source, color, creator_id, date_created, date_winner, date_closed, bet_ids, message_ids):
     self.code = code
     self.t1 = t1
     self.t2 = t2
@@ -73,14 +77,15 @@ class Match(Base):
     self.winner = winner
     self.odds_source = odds_source
     self.color = color
-    self.creator = creator
+    self.creator_id = creator_id
     self.date_created = date_created
     self.date_winner = date_winner
     self.date_closed = date_closed
     self.bet_ids = bet_ids
     self.message_ids = message_ids
   
-  
+  def __repr__(self):
+    return f"<Match {self.code}>"
   
   def to_string(self):
     date_formatted = self.date_created.strftime("%d/%m/%Y at %H:%M:%S")
@@ -103,7 +108,7 @@ class Match(Base):
   
   
   
-def is_valid_match(code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, odds_source, winner, color, creator, date_created, date_winner, date_closed, bet_ids, message_ids):
+def is_valid_match(code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, odds_source, winner, color, creator_id, date_created, date_winner, date_closed, bet_ids, message_ids):
   errors = [False for _ in range(17)]
   if isinstance(code, str) == False or len(code) != 8:
     errors[0] = True
@@ -138,9 +143,9 @@ def is_valid_match(code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, odds_sou
   if isinstance(color, str) == False or len(color) > 6:
     errors[10] = True
     print("color", color, type(color))
-  if isinstance(creator, int) == False:
+  if isinstance(creator_id, int) == False:
     errors[11] = True
-    print("creator", creator, type(creator))
+    print("creator", creator_id, type(creator_id))
   if isinstance(date_created, datetime) == False:
     errors[12] = True
     print("date_created", date_created, type(date_created))
@@ -158,4 +163,3 @@ def is_valid_match(code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, odds_sou
     print("message_ids", message_ids, type(message_ids))
 
   return errors
-

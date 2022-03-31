@@ -10,22 +10,26 @@ import math
 import secrets
 import sys
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, BOOLEAN
+from sqlalchemy import Column, String, BOOLEAN, create_engine
+from sqlalchemy.orm import relationship
 from sqltypes import JSONLIST
 
-Base = declarative_base()
+from base import Base
 
+engine = create_engine('sqlite:///savedata.db')
 
 class User(Base):
   __tablename__ = "user"
   
   code = Column(String(8), primary_key=True)
-  username = Column(String(32))
-  color = Column(String(6))
-  hidden = Column(BOOLEAN)
-  balances = Column(JSONLIST) #array of Tuple(bet_id, balance after change, date)
-  active_bet_ids = Column(JSONLIST) #array of strings code of active bets
-  loans = Column(JSONLIST) #array of Tuple(balance, date created, date paid)
+  username = Column(String(32), nullable=False)
+  color = Column(String(6), nullable=False)
+  hidden = Column(BOOLEAN, nullable=False)
+  balances = Column(JSONLIST, nullable=False) #array of Tuple(bet_id, balance after change, date)
+  active_bet_ids = Column(JSONLIST, nullable=False) #array of strings code of active bets
+  loans = Column(JSONLIST, nullable=False) #array of Tuple(balance, date created, date paid)
+  bets = relationship("Bet", back_populates="user", cascade="all, delete")
+  matches = relationship("Match", back_populates="creator", cascade="all, delete")
   
   def __init__(self, code, username, color, date_created):
     self.code = code
@@ -56,7 +60,9 @@ class User(Base):
     self.balances = balances
     self.active_bet_ids = active_bet_ids
     self.loans = loans
-    
+  
+  def __repr__(self):
+    return f"<User {self.code}>"
 
   def get_unique_code(self, prefix):
     #combine all_bal into one array
@@ -678,3 +684,4 @@ def is_valid_user(code, username, color, hidden, balances, active_bet_ids, loans
   if isinstance(loans, list) == False:
     errors[6] = True
   return errors
+

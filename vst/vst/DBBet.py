@@ -1,30 +1,34 @@
 from dbinterface import get_from_list
 import math
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, create_engine
+from sqlalchemy.orm import relationship
 import jsonpickle
 from sqlalchemy.ext.declarative import declarative_base
 from sqltypes import JSONLIST
 from datetime import datetime
-Base = declarative_base()
 
+from base import Base
 
+engine = create_engine('sqlite:///savedata.db')
 
 class Bet(Base):
   
   __tablename__ = "bet"
   
-  code = Column(String(8), primary_key = True)
-  t1 = Column(String(50))
-  t2 = Column(String(50))
-  tournament_name = Column(String(100))
-  winner = Column(Integer)
-  amount_bet = Column(Integer)
-  team_num = Column(Integer)
-  color = Column(String(6))
-  match_id = Column(String(8))
-  user_id = Column(Integer)
-  date_created = Column(DateTime)
-  message_ids = Column(JSONLIST)
+  code = Column(String(8), primary_key = True, nullable=False)
+  t1 = Column(String(50), nullable=False)
+  t2 = Column(String(50), nullable=False)
+  tournament_name = Column(String(100), nullable=False)
+  winner = Column(Integer, nullable=False)
+  amount_bet = Column(Integer, nullable=False)
+  team_num = Column(Integer, nullable=False)
+  color = Column(String(6), nullable=False)
+  match_id = Column(String(8), ForeignKey("match.code"), nullable=False)
+  match = relationship("Match", back_populates="bets")
+  user_id = Column(Integer, ForeignKey("user.code"), nullable=False)
+  user = relationship("User", back_populates="bets")
+  date_created = Column(DateTime, nullable=False)
+  message_ids = Column(JSONLIST, nullable=False)
   
   
   def __init__(self, code, t1, t2, tournament_name, amount_bet, team_num, color, match_id, user_id, date_created):
@@ -63,7 +67,8 @@ class Bet(Base):
       self.date_created = date_created
       self.message_ids = message_ids
   
-  
+  def __repr__(self):
+    return f"<Bet {self.code}>"
 
   def to_string(self):
     date_formatted = self.date_created.strftime("%d/%m/%Y at %H:%M:%S")
