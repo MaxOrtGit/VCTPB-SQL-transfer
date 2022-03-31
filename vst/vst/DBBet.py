@@ -149,7 +149,7 @@ def is_valid_bet(code, t1, t2, tournament_name, winner, amount_bet, team_num, co
     errors[5] = True
   if isinstance(team_num, int) == False:
     errors[6] = True
-  if isinstance(color, str) or len(color) != 6 == False:
+  if isinstance(color, str) == False or len(color) != 6:
     errors[7] = True
   if isinstance(match_id, str) == False or len(match_id) != 8:
     errors[8] = True

@@ -1,10 +1,11 @@
 
 from decimal import Decimal
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, Column, Numeric, Integer, String, DateTime
+from sqlalchemy import Table, Column, Integer, String, DateTime
+from sqlalchemy.orm import relationship
 import jsonpickle
 from datetime import datetime
-from sqltypes import JSONLIST
+from sqltypes import JSONLIST, DECIMAL
 Base = declarative_base()
 
 class Match(Base):
@@ -14,10 +15,10 @@ class Match(Base):
   code = Column(String(8), primary_key = True)
   t1 = Column(String(50))
   t2 = Column(String(50))
-  t1o = Column(Numeric(5, 3))
-  t2o = Column(Numeric(5, 3))
-  t1oo = Column(Numeric(5, 3))
-  t2oo = Column(Numeric(5, 3))
+  t1o = Column(DECIMAL(5, 3))
+  t2o = Column(DECIMAL(5, 3))
+  t1oo = Column(DECIMAL(5, 3))
+  t2oo = Column(DECIMAL(5, 3))
   tournament_name = Column(String(100))
   odds_source = Column(String(50))
   winner = Column(Integer)
@@ -26,7 +27,7 @@ class Match(Base):
   date_created = Column(DateTime(timezone = True))
   date_winner = Column(DateTime(timezone = True))
   date_closed = Column(DateTime(timezone = True))
-  bet_ids = Column(JSONLIST) #array of int
+  bets = relationship('Bet')
   message_ids = Column(JSONLIST) #array of int
   
   def __init__(self, code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, odds_source, color, creator, date_created):

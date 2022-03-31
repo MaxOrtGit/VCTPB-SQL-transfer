@@ -17,5 +17,6 @@
                 "command": "cd vst\npoetry run python vst/main.py",
             },
         ]
-    }
+    },
+    "editor.tabSize": 2
 }

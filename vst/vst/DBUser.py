@@ -10,32 +10,29 @@ import math
 import secrets
 import sys
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Boolean
+from sqlalchemy import Column, String, BOOLEAN
 from sqltypes import JSONLIST
 
 Base = declarative_base()
 
 
 class User(Base):
-
-  __tablename__ = "bet"
+  __tablename__ = "user"
   
   code = Column(String(8), primary_key=True)
   username = Column(String(32))
   color = Column(String(6))
-  hidden = Column(Boolean)
-  balances = Column(JSONLIST), #array of Tuple(bet_id, balance after change, date)
-  active_bet_ids = Column(JSONLIST), #array of strings code of active bets
-  loans = Column(JSONLIST), #array of Tuple(balance, date created, date paid)
-  
-  
+  hidden = Column(BOOLEAN)
+  balances = Column(JSONLIST) #array of Tuple(bet_id, balance after change, date)
+  active_bet_ids = Column(JSONLIST) #array of strings code of active bets
+  loans = Column(JSONLIST) #array of Tuple(balance, date created, date paid)
   
   def __init__(self, code, username, color, date_created):
     self.code = code
     self.username = username
     self.color = color
     
-    self.show_on_lb = True
+    self.hidden = True
     #a tuple (bet_id, balance after change, date)
     #if change is None then it is a reset
     #bet_id = id_[bet_id]: bet id
@@ -51,11 +48,11 @@ class User(Base):
     
     self.loans = []
 
-  def __init__(self, code, username, color, show_on_lb, balances, active_bet_ids, loans):
+  def __init__(self, code, username, color, hidden, balances, active_bet_ids, loans):
     self.code = code
     self.username = username
     self.color = color
-    self.show_on_lb = show_on_lb
+    self.hidden = hidden
     self.balances = balances
     self.active_bet_ids = active_bet_ids
     self.loans = loans
@@ -376,7 +373,7 @@ class User(Base):
 
 
       return im
-
+  
 
     
 def get_multi_graph_image(users, balance_range_ambig):
@@ -664,15 +661,15 @@ def num_of_bal_with_name(name, users):
   return num
 
 
-def is_valid_user(code, username, color, show_on_lb, balances, active_bet_ids, loans):
+def is_valid_user(code, username, color, hidden, balances, active_bet_ids, loans):
   errors = [False for _ in range(7)]
-  if isinstance(code, str) == False or len(code) > 20:
+  if isinstance(code, int) == False or len(str(code)) > 20:
     errors[0] = True
   if isinstance(username, str) == False or len(username) > 32:
     errors[1] = True
   if isinstance(color, str) == False or len(color) > 6:
     errors[2] = True
-  if isinstance(show_on_lb, bool) == False:
+  if isinstance(hidden, bool) == False:
     errors[3] = True
   if isinstance(balances, list) == False:
     errors[4] = True
