@@ -19,3 +19,7 @@ else:
     quit()
 
 
+
+from dbinterface import get_all_db, get_from_db
+
+print(get_all_db("match"))

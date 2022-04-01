@@ -2,7 +2,7 @@ from decimal import Decimal
 from multiprocessing import connection
 from xmlrpc.client import Boolean
 from savefiles import get_setting
-from dbinterface import get_all_objects
+from olddbinterface import get_all_objects
 import jsonpickle
 from sqlalchemy.exc import IntegrityError 
 
@@ -46,6 +46,7 @@ def files_to_db():
       return
     
     dbmatch = Match(match.code, match.t1, match.t2, match.t1o, match.t2o, match.t1oo, match.t2oo, match.tournament_name, match.winner, match.odds_source, match.color, match.creator, match.date_created, match.date_winner, match.date_closed, match.bet_ids, match.message_ids)
+    local_session = Session()
     Session.add(dbmatch)
     
   Session.commit()

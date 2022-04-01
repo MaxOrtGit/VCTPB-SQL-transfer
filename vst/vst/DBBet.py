@@ -1,4 +1,4 @@
-from dbinterface import get_from_list
+from olddbinterface import get_from_list
 import math
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
