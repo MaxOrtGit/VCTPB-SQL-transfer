@@ -4,7 +4,7 @@ from pytz import timezone
 from savefiles import save_file, get_file, delete_file, get_prefix
 
 from sqlaobjs import Session
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 from DBMatch import Match
 from DBUser import User
@@ -56,3 +56,6 @@ def get_from_db(table_name, code, session=None):
       return session.get(User, int(code))
     else:
       return None
+
+
+#delete is session.delete(obj)

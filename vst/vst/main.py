@@ -41,3 +41,10 @@ print(match.t1)
 match = get_from_db("match", code)
 
 print(match.t1)
+
+with Session.begin() as session:
+  umatch = get_from_db("match", code, session)
+  session.delete(umatch)
+
+match = get_from_db("match", code)
+print(match)
