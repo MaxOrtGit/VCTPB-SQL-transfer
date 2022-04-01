@@ -3,6 +3,7 @@ from multiprocessing import connection
 from xmlrpc.client import Boolean
 from savefiles import get_setting
 from olddbinterface import get_all_objects
+from dbinterface import *
 import ujson
 from sqlalchemy.exc import IntegrityError 
 from sqlalchemy import select
@@ -95,6 +96,8 @@ def files_to_db():
     session.add_all(dbmatches)
     session.add_all(dbbets)
     session.add_all(dbusers)
+    for dbuser in dbusers:
+      add_to_db(dbuser, session)
   
   
   return

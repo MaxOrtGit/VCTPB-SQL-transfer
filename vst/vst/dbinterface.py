@@ -1,10 +1,8 @@
 from datetime import datetime
-from sqlalchemy.orm import selectinload
 from pytz import timezone
-from savefiles import save_file, get_file, delete_file, get_prefix
 
 from sqlaobjs import Session
-from sqlalchemy import select, delete
+from sqlalchemy import select
 
 from DBMatch import Match
 from DBUser import User
@@ -40,22 +38,75 @@ def get_from_db(table_name, code, session=None):
   if session is None:
     with Session.begin() as session:
       if table_name == "match":
-        return session.get(Match, str(code))
+        return session.get(Match, str(code), populate_existing=True)
       elif table_name == "bet":
-        return session.get(Bet, str(code))
+        return session.get(Bet, str(code), populate_existing=True)
       elif table_name == "user":
-        return session.get(User, int(code))
+        return session.get(User, int(code), populate_existing=True)
       else:
         return None
   else:
     if table_name == "match":
-      return session.get(Match, str(code))
+      return session.get(Match, str(code), populate_existing=True)
     elif table_name == "bet":
-      return session.get(Bet, str(code))
+      return session.get(Bet, str(code), populate_existing=True)
     elif table_name == "user":
-      return session.get(User, int(code))
+      return session.get(User, int(code), populate_existing=True)
+    else:
+      return None
+    
+    
+def get_mult_from_db(table_name, codes, session=None):
+  if session is None:
+    with Session.begin() as session:
+      if table_name == "match":
+        return session.execute(select(Match).where(Match.code.in_(codes))).scalars().all()
+      elif table_name == "bet":
+        return session.execute(select(Bet).where(Bet.code.in_(codes))).scalars().all()
+      elif table_name == "user":
+        return session.execute(select(User).where(User.code.in_(codes))).scalars().all()
+      else:
+        return None
+  else:
+    if table_name == "match":
+      return session.execute(select(Match).where(Match.code.in_(codes))).scalars().all()
+    elif table_name == "bet":
+      return session.execute(select(Bet).where(Bet.code.in_(codes))).scalars().all()
+    elif table_name == "user":
+      return session.execute(select(User).where(User.code.in_(codes))).scalars().all()
     else:
       return None
 
 
-#delete is session.delete(obj)
+def delete_from_db(ambig, table_name=None, session=None):
+  if isinstance(ambig, str) or isinstance(ambig, int):
+    code = ambig
+    if session is None:
+      with Session.begin() as session:
+        if table_name == "match":
+          session.delete(session.get(Match, str(code)))
+        elif table_name == "bet":
+          session.delete(session.get(Bet, str(code)))
+        elif table_name == "user":
+          session.delete(session.get(User, int(code)))
+    else:
+      if table_name == "match":
+        session.delete(session.get(Match, str(code)))
+      elif table_name == "bet":
+        session.delete(session.get(Bet, str(code)))
+      elif table_name == "user":
+        session.delete(session.get(User, int(code)))
+  else:
+    if session is None:
+      with Session.begin() as session:
+        session.delete(ambig)
+    else:
+      session.delete(ambig)
+    
+    
+def add_to_db(obj, session=None):
+  if session is None:
+    with Session.begin() as session:
+      session.add(obj)
+  else:
+    session.add(obj)

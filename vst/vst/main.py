@@ -22,29 +22,86 @@ else:
 
 
 
-from dbinterface import get_all_db, get_from_db
+from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db
 
-matches = get_all_db("match")
-print(matches)
-code = matches[10].code
 
-match = get_from_db("match", code)
 
-print(match.t1)
 
-with Session.begin() as session:
-  umatch = get_from_db("match", code, session)
-  umatch.t1 = "test"
 
-print(match.t1)
+def test_get():
+  print("\n\n")
+  matches = get_all_db("match")
 
-match = get_from_db("match", code)
+  match_codes = [match.code for match in matches]
+  print(match_codes)
 
-print(match.t1)
+  match = get_from_db("match", match_codes[1])
+  print(match)
 
-with Session.begin() as session:
-  umatch = get_from_db("match", code, session)
-  session.delete(umatch)
 
-match = get_from_db("match", code)
-print(match)
+  print("\n\n")
+  #test get_mult
+
+  matches = get_mult_from_db("match", match_codes[2:8])
+  print(matches)
+  match_codes = [match.code for match in matches]
+
+  print(match_codes)
+
+
+def test_delete():
+  print("\n\n")
+
+  with Session.begin() as session:
+    matches = get_all_db("match", session=session)
+
+    match_codes = [match.code for match in matches]
+    code = match_codes[0]
+    
+    match = get_from_db("match", code, session)
+    print(match.code)
+    bets_codes = [bet.code for bet in match.bets]
+    print(bets_codes)
+    delete_from_db(match, session=session)
+    
+
+    match = get_from_db("match", code, session)
+    print(match)
+    
+    bets = get_mult_from_db("bet", bets_codes, session)
+    print(bets)
+    
+  
+
+
+def test_relat_ctp():
+  print("\n\n")
+  #test relationship child to parent
+
+  #need to use with for getting parents
+  with Session.begin() as session:
+    bets = get_all_db("bet", session=session)
+    bet = bets[-1]
+    match = bet.match
+    print(match)
+    user = match.creator
+    print(user)
+
+def test_relat_ptc():
+  print("\n\n")
+  #test relationship parent to child
+
+  with Session.begin() as session:
+    users = get_all_db("user", session=session)
+    user = users[0]
+    print(user)
+    match = user.matches[0]
+    print(match)
+    bet = match.bets[0]
+    print(bet)
+
+
+test_get()
+test_delete()
+test_relat_ctp()
+test_relat_ptc()
