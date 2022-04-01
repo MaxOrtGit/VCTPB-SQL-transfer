@@ -5,9 +5,10 @@ from sqlalchemy.orm import relationship
 from sqltypes import JSONLIST
 from datetime import datetime
 
-from sqlaobjs import Base
+from sqlaobjs import mapper_registry
 
-class Bet(Base):
+@mapper_registry.mapped
+class Bet():
   
   __tablename__ = "bet"
   

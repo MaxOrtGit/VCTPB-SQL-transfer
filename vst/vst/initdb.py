@@ -3,8 +3,9 @@ from multiprocessing import connection
 from xmlrpc.client import Boolean
 from savefiles import get_setting
 from olddbinterface import get_all_objects
-import jsonpickle
+import ujson
 from sqlalchemy.exc import IntegrityError 
+from sqlalchemy import select
 
 from sqlaobjs import *
 
@@ -18,13 +19,20 @@ def create_db():
     print("savedata.db does not exist.\nquitting")
     quit()
 
-  Base.metadata.create_all(Engine, checkfirst=True)
+  with Engine.begin() as connection:
+      mapper_registry.metadata.create_all(connection)
   
   
 
 def files_to_db():
   
   matches = get_all_objects("match")
+  bets = get_all_objects("bet") 
+  users = get_all_objects("user")
+  
+  dbmatches = []
+  dbbets = []
+  dbusers = []
   
   
   for match in matches:
@@ -40,19 +48,14 @@ def files_to_db():
         error = True
     if error:
       print("Error in match:", match.code)
-      print(jsonpickle.encode(match))
+      print(ujson.dumps(match))
       print(list(enumerate(errors)))
       print(list(enumerate([match.code, match.t1, match.t2, match.t1o, match.t2o, match.t1oo, match.t2oo, match.tournament_name, match.odds_source, match.winner, match.color, match.creator, match.date_created, match.date_winner, match.date_closed, match.bet_ids, match.message_ids])))
       return
     
     dbmatch = Match(match.code, match.t1, match.t2, match.t1o, match.t2o, match.t1oo, match.t2oo, match.tournament_name, match.winner, match.odds_source, match.color, match.creator, match.date_created, match.date_winner, match.date_closed, match.bet_ids, match.message_ids)
-    local_session = Session()
-    Session.add(dbmatch)
-    
-  Session.commit()
-    
-    
-  bets = get_all_objects("bet") 
+    dbmatches.append(dbmatch)
+
     
   for bet in bets:
     errors = is_valid_bet(bet.code, bet.t1, bet.t2, bet.tournament_name, bet.winner, bet.bet_amount, bet.team_num, bet.color, bet.match_id, bet.user_id, bet.date_created, bet.message_ids)
@@ -62,19 +65,14 @@ def files_to_db():
         error = True
     if error:
       print("Error in bet:", bet.code)
-      print(jsonpickle.encode(bet))
+      print(ujson.dumps(bet))
       print(list(enumerate(errors)))
       print(list(enumerate([bet.code, bet.t1, bet.t2, bet.tournament_name, bet.winner, bet.bet_amount, bet.team_num, bet.color, bet.match_id, bet.user_id, bet.date_created, bet.message_ids])))
       return
 
     dbbet = Bet(bet.code, bet.t1, bet.t2, bet.tournament_name, bet.winner, bet.bet_amount, bet.team_num, bet.color, bet.match_id, bet.user_id, bet.date_created, bet.message_ids)
-    Session.add(dbbet)
-  
-  Session.commit()
-  
-  
-  users = get_all_objects("user")
-  
+    dbbets.append(dbbet)
+    
   for user in users:
     print(user.show_on_lb)
     errors = is_valid_user(user.code, user.username, user.color, user.show_on_lb, user.balance, user.active_bet_ids, user.loans)
@@ -84,29 +82,30 @@ def files_to_db():
         error = True
     if error:
       print("Error in user:", user.code)
-      print(jsonpickle.encode(user))
+      print(ujson.dumps(user))
       print(list(enumerate(errors)))
       print(list(enumerate([user.code, user.username, user.color, user.show_on_lb, user.balance, user.active_bet_ids, user.loans])))
       return
     
     dbuser = User(user.code, user.username, user.color, user.show_on_lb, user.balance, user.active_bet_ids, user.loans)
-    Session.add(dbuser)
+    dbusers.append(dbuser)
     
-  try:
-    Session.commit()
-  except IntegrityError as IE:
-    print("error:", IE)
-    pass
+    
+  with Session.begin() as session:
+    session.add_all(dbmatches)
+    session.add_all(dbbets)
+    session.add_all(dbusers)
   
-  #return
-  matchess = Session.query(Match).all()
+  
+  return
+  matchess = select(Match)
   mbets = [m.bets for m in matchess]
   mcreator = [m.creator for m in matchess]
   
   #print(mbets)
   #print(mcreator)
   
-  betss = Session.query(Bet).all()
+  betss = select(Match)
   bcodes = [b.code for b in betss]
   bmatch = [b.match for b in betss]
   buser = [b.user for b in betss]
@@ -116,7 +115,7 @@ def files_to_db():
   
   #print(bresult)
   
-  userss = Session.query(User).all()
+  userss = select(Match)
   ucodes = [u.code for u in userss]
   ubets = [u.bets for u in userss]
   umatches = [u.matches for u in userss]

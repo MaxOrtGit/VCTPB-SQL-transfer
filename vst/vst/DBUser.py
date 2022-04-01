@@ -13,9 +13,10 @@ from sqlalchemy import Column, String, BOOLEAN
 from sqlalchemy.orm import relationship
 from sqltypes import JSONLIST
 
-from sqlaobjs import Base
+from sqlaobjs import mapper_registry
 
-class User(Base):
+@mapper_registry.mapped
+class User():
   __tablename__ = "user"
   
   code = Column(String(8), primary_key=True)

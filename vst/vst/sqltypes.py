@@ -1,19 +1,20 @@
 from sqlalchemy.types import TypeDecorator, VARCHAR, String
-import jsonpickle
+import pickle
 from decimal import Decimal
+import time
 
 class JSONLIST(TypeDecorator):
   
-  impl = VARCHAR
+  impl = String
 
   def process_bind_param(self, value, dialect):
     if value is not None:
-      value = jsonpickle.encode(value)
+      value = pickle.dumps(value)
     return value
 
   def process_result_value(self, value, dialect):
     if value is not None:
-      value = jsonpickle.decode(value)
+      value = pickle.loads(value)
     return value
   
   

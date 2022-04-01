@@ -1,8 +1,8 @@
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import registry
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
-Base = declarative_base()
+
+mapper_registry = registry()
 Engine = create_engine('sqlite:///savedata.db', future=True)
-Session = sessionmaker(bind = Engine)
-session = Session()
+Session = sessionmaker(bind=Engine, future=True, expire_on_commit=False)

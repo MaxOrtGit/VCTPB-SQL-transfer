@@ -1,13 +1,13 @@
 from decimal import Decimal
-from sqlalchemy import Table, Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from sqltypes import JSONLIST, DECIMAL
 
-from sqlaobjs import Base
+from sqlaobjs import mapper_registry
 
-
-class Match(Base):
+@mapper_registry.mapped
+class Match():
   
   __tablename__ = "match"
   
