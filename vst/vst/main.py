@@ -29,7 +29,7 @@ from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_d
 
 
 def test_get():
-  print("\n\n")
+  print("\n")
   matches = get_all_db("match")
 
   match_codes = [match.code for match in matches]
@@ -39,7 +39,7 @@ def test_get():
   print(match)
 
 
-  print("\n\n")
+  print("\n")
   #test get_mult
 
   matches = get_mult_from_db("match", match_codes[2:8])
@@ -50,7 +50,7 @@ def test_get():
 
 
 def test_delete():
-  print("\n\n")
+  print("\n")
 
   with Session.begin() as session:
     matches = get_all_db("match", session=session)
@@ -75,7 +75,7 @@ def test_delete():
 
 
 def test_relat_ctp():
-  print("\n\n")
+  print("\n")
   #test relationship child to parent
 
   #need to use with for getting parents
@@ -87,8 +87,9 @@ def test_relat_ctp():
     user = match.creator
     print(user)
 
+
 def test_relat_ptc():
-  print("\n\n")
+  print("\n")
   #test relationship parent to child
 
   with Session.begin() as session:
@@ -100,8 +101,24 @@ def test_relat_ptc():
     bet = match.bets[0]
     print(bet)
 
+def test_relat_get_match():
+  print("\n")
+  #test relationship parent to child
+  
+  matches = get_all_db("match")
+  code = matches[-1].code
+  
+  match = get_from_db("match", code)
+  user = match.creator
+  print(user)
+  bets = match.bets
+  print(bets)
+  
+
+
 
 test_get()
 test_delete()
 test_relat_ctp()
 test_relat_ptc()
+test_relat_get_match()
