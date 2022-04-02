@@ -72,5 +72,9 @@ def is_key_in_db(table_name, key, session=None):
     with Session.begin() as session:
       return is_key_in_db(table_name, key, session)
   else:
-    return session.execute(select(eval(table_name))).keys().__contains__(key)
+    if table_name == "Color":
+      return session.scalars(select(Color).where(Color.name == key)).one_or_none() is not None
+    else:
+      obj = eval(table_name)
+      return session.scalars(select(obj).where(obj.code == key)).one_or_none() is not None
       

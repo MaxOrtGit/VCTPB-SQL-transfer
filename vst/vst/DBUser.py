@@ -9,7 +9,7 @@ import random
 import math
 import secrets
 import sys
-from sqlalchemy import Column, String, BOOLEAN
+from sqlalchemy import Column, String, BOOLEAN, ForeignKey
 from sqlalchemy.orm import relationship
 from sqltypes import JSONLIST
 
@@ -21,7 +21,9 @@ class User():
   
   code = Column(String(8), primary_key=True)
   username = Column(String(32), nullable=False)
-  color = Column(String(6), nullable=False)
+  color_name = Column(String(32), ForeignKey("color.name"))
+  color = relationship("Color", back_populates="users")
+  color_code = Column(String(6), nullable=False)
   hidden = Column(BOOLEAN, nullable=False)
   balances = Column(JSONLIST, nullable=False) #array of Tuple(bet_id, balance after change, date)
   active_bet_ids = Column(JSONLIST, nullable=False) #array of strings code of active bets
@@ -32,7 +34,7 @@ class User():
   def __init__(self, code, username, color, date_created):
     self.code = code
     self.username = username
-    self.color = color
+    self.set_color(color)
     
     self.hidden = True
     #a tuple (bet_id, balance after change, date)
@@ -53,11 +55,22 @@ class User():
   def __init__(self, code, username, color, hidden, balances, active_bet_ids, loans):
     self.code = code
     self.username = username
-    self.color = color
+    self.set_color(color)
     self.hidden = hidden
     self.balances = balances
     self.active_bet_ids = active_bet_ids
     self.loans = loans
+  
+  def set_color(self, color):
+    if isinstance(color, str):
+      self.color = None
+      self.color_name = None
+      self.color_code = color
+      return
+    self.color = color
+    print(self.color_name, self.color.name)
+    self.color_name = color.name
+    self.color_code = color.code
   
   def __repr__(self):
     return f"<User {self.code}>"

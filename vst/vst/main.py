@@ -71,8 +71,8 @@ def test_is_key_in_db():
   print(is_key_in_db("Match", match.code[:-1] + "l"))
   print(is_key_in_db("Bet", bet.code))
   print(is_key_in_db("Bet", bet.code[:-1] + "l"))
-  print(is_key_in_db("User", user.username))
-  print(is_key_in_db("User", user.username[:-1] + "l"))
+  print(is_key_in_db("User", user.code))
+  print(is_key_in_db("User", user.code[:-1] + "l"))
   
 
 def test_delete_match():
@@ -229,8 +229,8 @@ def test_is_key_in_db_color():
   colors = get_all_db("Color")
   color = colors[0]
   
-  print(is_key_in_db("Color", color.code))
-  print(is_key_in_db("Color", color.code[:-1] + "l"))
+  print(is_key_in_db("Color", color.name))
+  print(is_key_in_db("Color", color.name[:-1] + "l"))
 
 
 def test_add_color():
@@ -249,7 +249,7 @@ test_get_mult()
 test_is_key_in_db()
 test_delete_match()
 test_delete_bet()
-#test_delete_user()
+test_delete_user()
 test_relat_ctp()
 test_relat_ptc()
 test_relat_get_match()
@@ -257,6 +257,7 @@ test_relat_get_match()
 
 test_get_color()
 test_get_mult_color()
-test_is_key_in_db()
+test_is_key_in_db_color()
 test_add_color()
 #add color relation to match
+

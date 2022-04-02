@@ -29,7 +29,8 @@ class Match:
     self.date_closed = None
     self.winner = 0
   
-
+  def set_color(self, color):
+    self.color = color
   
   def to_string(self):
     date_formatted = self.date_created.strftime("%d/%m/%Y at %H:%M:%S")
