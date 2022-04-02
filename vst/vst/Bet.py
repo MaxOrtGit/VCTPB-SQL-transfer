@@ -37,10 +37,10 @@ class Bet:
       return self.t2
     
   def get_match(self):
-    return get_from_list("match", self.match_id)
+    return get_from_list("Match", self.match_id)
     
   def get_team_and_payout(self):
-    match = get_from_list("match", self.match_id)
+    match = get_from_list("Match", self.match_id)
 
     team = ""
     payout = 0.0
@@ -81,13 +81,13 @@ class Bet:
 
   async def basic_to_string(self, bot, match=None):
     if match is None:
-      match = get_from_list("match", self.match_id)
+      match = get_from_list("Match", self.match_id)
 
     return f"Bet: {self.code}, User: <@!{self.user_id}>, Team: {self.get_team()}, Amount: {self.amount_bet}, Match ID: {match.code}"
   
   def balance_to_string(self, balance):
     
-    match = get_from_list("match", self.match_id)
+    match = get_from_list("Match", self.match_id)
     (team, winner) = self.get_team_and_winner()
 
     return f"{match.t1} vs {match.t2}, Bet on: {team}, Winner: {winner}, Amount bet: {math.floor(self.amount_bet)}, Balance change: {math.floor(balance)}"

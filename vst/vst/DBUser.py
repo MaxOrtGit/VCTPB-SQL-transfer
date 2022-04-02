@@ -106,12 +106,12 @@ class User():
     used = 0
     active_bet_ids_bets = self.active_bet_ids_bets()
     for bet_id in active_bet_ids_bets:
-      temp_bet = get_from_list("bet", bet_id)
+      temp_bet = get_from_list("Bet", bet_id)
       if temp_bet == None:
         ids = [t for t in self.active_bet_ids if bet_id == t[0]]
         for id in ids:
           self.active_bet_ids.remove(id)
-        replace_in_list("user", self.code, self)
+        replace_in_list("User", self.code, self)
         continue
       used += temp_bet.amount_bet
 
@@ -161,7 +161,7 @@ class User():
       if balance[0] == id:
         self.balances.remove(balance)
         break
-    replace_in_list("user", self.code, self)
+    replace_in_list("User", self.code, self)
 
   def change_award_name(self, award_label, name):
     for balance in self.balances:
@@ -170,7 +170,7 @@ class User():
         break
     else:
       return None
-    replace_in_list("user", self.code, self)
+    replace_in_list("User", self.code, self)
     return self
   
   
@@ -199,7 +199,7 @@ class User():
       balance_change = balance[1] - before
       if balance[0].startswith("id_"):
         #bet id
-        bet = get_from_list("bet", balance[0][3:])
+        bet = get_from_list("Bet", balance[0][3:])
 
         embeds[endex].add_field(name=f"Bet: {bet.code}", value=bet.balance_to_string(balance_change), inline=False)
         
@@ -284,7 +284,7 @@ class User():
           line_colors.append('k')
       before = amount
       if bet_id.startswith('id_'):
-        bet = get_from_list("bet", bet_id[3:])
+        bet = get_from_list("Bet", bet_id[3:])
         match = bet.get_match()
         t1 = match.t1
         t2 = match.t2
@@ -438,7 +438,7 @@ def get_multi_graph_image(users, balance_range_ambig):
     bet_id, amount = balance[:2]
 
     if bet_id.startswith('id_'):
-      bet = get_from_list("bet", bet_id[3:])
+      bet = get_from_list("Bet", bet_id[3:])
       match = bet.get_match()
       bet_id = f"id_{match.code}"
 

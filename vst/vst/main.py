@@ -30,19 +30,19 @@ from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_d
 
 def test_get():
   print("\ntest_get")
-  matches = get_all_db("match")
+  matches = get_all_db("Match")
 
   match_codes = [match.code for match in matches]
   print(match_codes)
 
-  match = get_from_db("match", match_codes[1])
+  match = get_from_db("Match", match_codes[1])
   print(match)
 
 
   print("\n")
   #test get_mult
 
-  matches = get_mult_from_db("match", match_codes[2:8])
+  matches = get_mult_from_db("Match", match_codes[2:8])
   print(matches)
   match_codes = [match.code for match in matches]
 
@@ -53,22 +53,22 @@ def test_delete_match():
   print("\ntest_delete_match")
 
   with Session.begin() as session:
-    matches = get_all_db("match", session)
+    matches = get_all_db("Match", session)
 
     match_codes = [match.code for match in matches]
     code = match_codes[0]
     
-    match = get_from_db("match", code, session)
+    match = get_from_db("Match", code, session)
     print(match.code)
     bets_codes = [bet.code for bet in match.bets]
     print(bets_codes)
     delete_from_db(match, session=session)
     
 
-    match = get_from_db("match", code, session)
+    match = get_from_db("Match", code, session)
     print(match)
     
-    bets = get_mult_from_db("bet", bets_codes, session)
+    bets = get_mult_from_db("Bet", bets_codes, session)
     print(bets)
     
     
@@ -76,22 +76,22 @@ def test_delete_bet():
   print("\ntest_delete_bet")
   
   with Session.begin() as session:
-    bets = get_all_db("bet", session)
+    bets = get_all_db("Bet", session)
     
     bet_codes = [bet.code for bet in bets]
     
     code = bet_codes[0]
     
-    bet = get_from_db("bet", code, session)
+    bet = get_from_db("Bet", code, session)
     
     match = bet.match
     m_code = match.code
     
     delete_from_db(bet, session=session)
     
-    bet = get_from_db("bet", code, session)
+    bet = get_from_db("Bet", code, session)
     
-    match = get_from_db("match", m_code, session)
+    match = get_from_db("Match", m_code, session)
     
     print(bet)
     print(match)
@@ -100,7 +100,7 @@ def test_delete_bet():
 def test_delete_user():
   print("\ntest_delete_user")
   with Session.begin() as session:
-    users = get_all_db("user", session)
+    users = get_all_db("User", session)
     user = users[0]
     match = user.matches[0]
     print(match.creator.username)
@@ -111,10 +111,10 @@ def test_delete_user():
     
     delete_from_db(user, session=session)
     print(user.code)
-    user = get_from_db("user", user.code, session)
+    user = get_from_db("User", user.code, session)
     
-    match = get_from_db("match", mcode, session)
-    bet = get_from_db("bet", bcode, session)
+    match = get_from_db("Match", mcode, session)
+    bet = get_from_db("Bet", bcode, session)
     print(user)
     print(match)
     print(bet)
@@ -128,7 +128,7 @@ def test_relat_ctp():
 
   #need to use with for getting parents
   with Session.begin() as session:
-    bets = get_all_db("bet", session)
+    bets = get_all_db("Bet", session)
     bet = bets[-1]
     match = bet.match
     print(match)
@@ -141,7 +141,7 @@ def test_relat_ptc():
   #test relationship parent to child
 
   with Session.begin() as session:
-    users = get_all_db("user", session)
+    users = get_all_db("User", session)
     user = users[0]
     print(user)
     match = user.matches[0]
@@ -154,10 +154,10 @@ def test_relat_get_match():
   #test relationship parent to child
   
   with Session.begin() as session:
-    matches = get_all_db("match", session)
+    matches = get_all_db("Match", session)
     code = matches[-1].code
     
-    match = get_from_db("match", code, session)
+    match = get_from_db("Match", code, session)
     user = match.creator
     print(user)
     bets = match.bets
@@ -167,26 +167,37 @@ def test_relat_get_match():
 def test_get_color():
   print("\ntest_get_color")
   
-  colors = get_all_db("color")
+  colors = get_all_db("Color")
   print(colors)
   
   color_name = colors[0].name
   
-  color = get_from_db("color", color_name)
+  color = get_from_db("Color", color_name)
   print(color)
+
+def test_add_color():
+  print("\ntest_add_color")
   
+  color = Color("Orange", "FFA500")
+  add_to_db(color)
   
+  color = get_from_db("Color", "Orange")
+  print(color)
     
+  
 
 
 
-test_get()
-test_delete_match()
-test_delete_bet()
+
+#test_get()
+#test_delete_match()
+#test_delete_bet()
 #test_delete_user()
-test_relat_ctp()
-test_relat_ptc()
-test_relat_get_match()
+#test_relat_ctp()
+#test_relat_ptc()
+#test_relat_get_match()
 
 
 test_get_color()
+test_add_color()
+#add color relation to match
