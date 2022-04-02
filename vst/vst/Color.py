@@ -20,3 +20,7 @@ class Color():
   def __init__(self, name, hex):
     self.name = name
     self.hex = hex
+    
+    
+  def __repr__(self):
+    return f"<Color {self.name}, {self.hex}>"

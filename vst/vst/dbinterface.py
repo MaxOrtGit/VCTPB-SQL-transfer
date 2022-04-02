@@ -36,11 +36,13 @@ def get_from_db(table_name, code, session=None):
       return get_from_db(table_name, code, session)
   else:
     if table_name == "match":
-      return session.get(Match, str(code), populate_existing=True)
+      return session.get(Match, code, populate_existing=True)
     elif table_name == "bet":
-      return session.get(Bet, str(code), populate_existing=True)
+      return session.get(Bet, code, populate_existing=True)
     elif table_name == "user":
-      return session.get(User, int(code), populate_existing=True)
+      return session.get(User, code, populate_existing=True)
+    elif table_name == "color":
+      return session.get(Color, code, populate_existing=True)
     else:
       return None
     
@@ -48,14 +50,7 @@ def get_from_db(table_name, code, session=None):
 def get_mult_from_db(table_name, codes, session=None):
   if session is None:
     with Session.begin() as session:
-      if table_name == "match":
-        return session.execute(select(Match).where(Match.code.in_(codes))).scalars().all()
-      elif table_name == "bet":
-        return session.execute(select(Bet).where(Bet.code.in_(codes))).scalars().all()
-      elif table_name == "user":
-        return session.execute(select(User).where(User.code.in_(codes))).scalars().all()
-      else:
-        return None
+      return get_mult_from_db(table_name, codes, session)
   else:
     if table_name == "match":
       return session.execute(select(Match).where(Match.code.in_(codes))).scalars().all()
@@ -63,6 +58,8 @@ def get_mult_from_db(table_name, codes, session=None):
       return session.execute(select(Bet).where(Bet.code.in_(codes))).scalars().all()
     elif table_name == "user":
       return session.execute(select(User).where(User.code.in_(codes))).scalars().all()
+    elif table_name == "color":
+      return session.execute(select(Color).where(Color.name.in_(codes))).scalars().all()
     else:
       return None
 
@@ -71,20 +68,16 @@ def delete_from_db(ambig, table_name=None, session=None):
   if isinstance(ambig, str) or isinstance(ambig, int):
     code = ambig
     if session is None:
-      with Session.begin() as session:
-        if table_name == "match":
-          session.delete(session.get(Match, str(code)))
-        elif table_name == "bet":
-          session.delete(session.get(Bet, str(code)))
-        elif table_name == "user":
-          session.delete(session.get(User, int(code)))
+      return delete_from_db(code, table_name, session)
     else:
       if table_name == "match":
-        session.delete(session.get(Match, str(code)))
+        session.delete(session.get(Match, code))
       elif table_name == "bet":
-        session.delete(session.get(Bet, str(code)))
+        session.delete(session.get(Bet, code))
       elif table_name == "user":
-        session.delete(session.get(User, int(code)))
+        session.delete(session.get(User, code))
+      elif table_name == "color":
+        session.delete(session.get(Color, code))
   else:
     if session is None:
       with Session.begin() as session:

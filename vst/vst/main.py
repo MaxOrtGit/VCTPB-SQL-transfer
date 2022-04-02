@@ -164,6 +164,21 @@ def test_relat_get_match():
     print(bets)
   
 
+def test_get_color():
+  print("\ntest_get_color")
+  
+  colors = get_all_db("color")
+  print(colors)
+  
+  color_name = colors[0].name
+  
+  color = get_from_db("color", color_name)
+  print(color)
+  
+  
+    
+
+
 
 test_get()
 test_delete_match()
@@ -172,3 +187,6 @@ test_delete_bet()
 test_relat_ctp()
 test_relat_ptc()
 test_relat_get_match()
+
+
+test_get_color()
