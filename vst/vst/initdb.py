@@ -95,7 +95,7 @@ def files_to_db():
     dbusers.append(dbuser)
     
   for color in colors:
-    dbcolor = Color(color[0], color[1])
+    dbcolor = Color(color[0].capitalize(), color[1])
     dbcolors.append(dbcolor)
     
     

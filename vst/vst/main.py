@@ -22,7 +22,7 @@ else:
 
 
 
-from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db
+from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db
 
 
 
@@ -39,15 +39,41 @@ def test_get():
   print(match)
 
 
-  print("\n")
-  #test get_mult
+def test_get_mult():
+  print("\ntest_get_mult")
+  
+  matches = get_all_db("Match")
+
+  match_codes = [match.code for match in matches]
 
   matches = get_mult_from_db("Match", match_codes[2:8])
   print(matches)
   match_codes = [match.code for match in matches]
 
   print(match_codes)
+  print(is_key_in_db("Match", match_codes[0]))
+  print(is_key_in_db("Match", "1234567l"))
 
+
+def test_is_key_in_db():
+  print("\ntest_is_key_in_db")
+  matches = get_all_db("Match")
+  match = matches[0]
+  
+  bets = get_all_db("Bet")
+  bet = bets[0]
+  
+  users = get_all_db("User")
+  user = users[0]
+  
+  
+  print(is_key_in_db("Match", match.code))
+  print(is_key_in_db("Match", match.code[:-1] + "l"))
+  print(is_key_in_db("Bet", bet.code))
+  print(is_key_in_db("Bet", bet.code[:-1] + "l"))
+  print(is_key_in_db("User", user.username))
+  print(is_key_in_db("User", user.username[:-1] + "l"))
+  
 
 def test_delete_match():
   print("\ntest_delete_match")
@@ -121,7 +147,6 @@ def test_delete_user():
     
   
 
-
 def test_relat_ctp():
   print("\ntest_relat_ctp")
   #test relationship child to parent
@@ -143,11 +168,15 @@ def test_relat_ptc():
   with Session.begin() as session:
     users = get_all_db("User", session)
     user = users[0]
-    print(user)
-    match = user.matches[0]
-    print(match)
-    bet = match.bets[0]
-    print(bet)
+    print(user, user.username)
+    matches = user.matches
+    print(matches)
+    nmatch = get_from_db("Match", matches[0].code, session)
+    nbets = nmatch.bets
+    print(nbets)
+    bets = matches[0].bets
+    print(bets)
+
 
 def test_relat_get_match():
   print("\ntest_relat_get_match")
@@ -164,6 +193,8 @@ def test_relat_get_match():
     print(bets)
   
 
+
+
 def test_get_color():
   print("\ntest_get_color")
   
@@ -174,6 +205,33 @@ def test_get_color():
   
   color = get_from_db("Color", color_name)
   print(color)
+    
+  
+def test_get_mult_color():
+  print("\ntest_get_mult_color")
+  
+  colors = get_all_db("Color")
+
+  color_codes = [color.name for color in colors]
+
+  colorss = get_mult_from_db("Color", color_codes[2:8])
+  print(colorss)
+  color_codes = [color.name for color in colorss]
+
+  print(color_codes)
+  print(is_key_in_db("Color", color_codes[0]))
+  print(is_key_in_db("Color", "1234567l"))
+
+
+def test_is_key_in_db_color():
+  print("\ntest_is_key_in_db_color")
+  
+  colors = get_all_db("Color")
+  color = colors[0]
+  
+  print(is_key_in_db("Color", color.code))
+  print(is_key_in_db("Color", color.code[:-1] + "l"))
+
 
 def test_add_color():
   print("\ntest_add_color")
@@ -183,21 +241,22 @@ def test_add_color():
   
   color = get_from_db("Color", "Orange")
   print(color)
-    
+  
   
 
-
-
-
-#test_get()
-#test_delete_match()
-#test_delete_bet()
+test_get()
+test_get_mult()
+test_is_key_in_db()
+test_delete_match()
+test_delete_bet()
 #test_delete_user()
-#test_relat_ctp()
-#test_relat_ptc()
-#test_relat_get_match()
+test_relat_ctp()
+test_relat_ptc()
+test_relat_get_match()
 
 
 test_get_color()
+test_get_mult_color()
+test_is_key_in_db()
 test_add_color()
 #add color relation to match

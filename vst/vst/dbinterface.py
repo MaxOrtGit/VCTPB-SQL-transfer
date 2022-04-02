@@ -13,6 +13,8 @@ def get_date():
   central = timezone('US/Central')
   return datetime.now(central)
 
+
+
 def get_all_db(table_name, session=None):
   if session is None:
     with Session.begin() as session:
@@ -32,9 +34,13 @@ def get_from_db(table_name, code, session=None):
 def get_mult_from_db(table_name, codes, session=None):
   if session is None:
     with Session.begin() as session:
-      return session.execute(select(eval(table_name)).where(Match.code.in_(codes))).scalars().all()
+      return get_mult_from_db(table_name, codes, session)
   else:
-    return session.execute(select(eval(table_name)).where(Match.code.in_(codes))).scalars().all()
+    if table_name == "Color":
+      return session.scalars(select(Color).where(Color.name.in_(codes))).all()
+    else:
+      obj = eval(table_name)
+      return session.scalars(select(obj).where(obj.code.in_(codes))).all()
 
 
 def delete_from_db(ambig, table_name=None, session=None):
@@ -60,13 +66,11 @@ def add_to_db(obj, session=None):
   else:
     session.add(obj)
 
+
 def is_key_in_db(table_name, key, session=None):
   if session is None:
     with Session.begin() as session:
-      is_key_in_db(table_name, key, session)
+      return is_key_in_db(table_name, key, session)
   else:
-    if table_name == "color":
-      return session.execute(select(func.count(eval(table_name))).where(eval(table_name).name == key)) > 0
-    else:
-      return session.execute(select(func.count(eval(table_name))).where(eval(table_name).code == key)) > 0
+    return session.execute(select(eval(table_name))).keys().__contains__(key)
       
