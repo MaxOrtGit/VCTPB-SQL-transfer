@@ -27,7 +27,7 @@ class User():
   active_bet_ids = Column(JSONLIST, nullable=False) #array of strings code of active bets
   loans = Column(JSONLIST, nullable=False) #array of Tuple(balance, date created, date paid)
   bets = relationship("Bet", back_populates="user", cascade="all, delete")
-  matches = relationship("Match", back_populates="creator", cascade="all, delete")
+  matches = relationship("Match", back_populates="creator")
   
   def __init__(self, code, username, color, date_created):
     self.code = code

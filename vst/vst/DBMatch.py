@@ -22,7 +22,7 @@ class Match():
   odds_source = Column(String(50), nullable=False)
   winner = Column(Integer, nullable=False)
   color = Column(String(6), nullable=False)
-  creator_id = Column(Integer, ForeignKey("user.code"), nullable=False)
+  creator_id = Column(Integer, ForeignKey("user.code"))
   creator = relationship("User", back_populates="matches")
   date_created = Column(DateTime(timezone = True), nullable=False)
   date_winner = Column(DateTime(timezone = True), nullable=False)

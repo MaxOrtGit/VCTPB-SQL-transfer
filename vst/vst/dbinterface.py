@@ -7,6 +7,7 @@ from sqlalchemy import select
 from DBMatch import Match
 from DBUser import User
 from DBBet import Bet
+from Color import Color
 
 def get_date():
   central = timezone('US/Central')
@@ -15,14 +16,7 @@ def get_date():
 def get_all_db(table_name, session=None):
   if session is None:
     with Session.begin() as session:
-      if table_name == "match":
-        return session.scalars(select(Match)).all()
-      elif table_name == "bet":
-        return session.scalars(select(Bet)).all()
-      elif table_name == "user":
-        return session.scalars(select(User)).all()
-      else:
-        return None
+      return get_all_db(table_name, session)
   else:
     if table_name == "match":
       return session.scalars(select(Match)).all()
@@ -30,6 +24,8 @@ def get_all_db(table_name, session=None):
       return session.scalars(select(Bet)).all()
     elif table_name == "user":
       return session.scalars(select(User)).all()
+    elif table_name == "color":
+      return session.scalars(select(Color)).all()
     else:
       return None
 
@@ -37,14 +33,7 @@ def get_all_db(table_name, session=None):
 def get_from_db(table_name, code, session=None):
   if session is None:
     with Session.begin() as session:
-      if table_name == "match":
-        return session.get(Match, str(code), populate_existing=True)
-      elif table_name == "bet":
-        return session.get(Bet, str(code), populate_existing=True)
-      elif table_name == "user":
-        return session.get(User, int(code), populate_existing=True)
-      else:
-        return None
+      return get_from_db(table_name, code, session)
   else:
     if table_name == "match":
       return session.get(Match, str(code), populate_existing=True)

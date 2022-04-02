@@ -4,6 +4,7 @@ from xmlrpc.client import Boolean
 from savefiles import get_setting
 from olddbinterface import get_all_objects
 from dbinterface import *
+from oldcolorinterface import get_all_colors_key_hex
 import ujson
 from sqlalchemy.exc import IntegrityError 
 from sqlalchemy import select
@@ -13,6 +14,7 @@ from sqlaobjs import *
 from DBUser import User, is_valid_user
 from DBMatch import Match, is_valid_match
 from DBBet import Bet, is_valid_bet
+from Color import Color
 
 def create_db():
   
@@ -30,11 +32,12 @@ def files_to_db():
   matches = get_all_objects("match")
   bets = get_all_objects("bet") 
   users = get_all_objects("user")
+  colors = get_all_colors_key_hex()
   
   dbmatches = []
   dbbets = []
   dbusers = []
-  
+  dbcolors = []
   
   for match in matches:
     match.t1o = Decimal(str(match.t1o))
@@ -91,13 +94,17 @@ def files_to_db():
     dbuser = User(user.code, user.username, user.color, user.show_on_lb, user.balance, user.active_bet_ids, user.loans)
     dbusers.append(dbuser)
     
+  for color in colors:
+    dbcolor = Color(color[0], color[1])
+    dbcolors.append(dbcolor)
+    
+    
     
   with Session.begin() as session:
     session.add_all(dbmatches)
     session.add_all(dbbets)
     session.add_all(dbusers)
-    for dbuser in dbusers:
-      add_to_db(dbuser, session)
+    session.add_all(dbcolors)
   
   
   return
