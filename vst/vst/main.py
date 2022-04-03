@@ -303,6 +303,7 @@ def test_delete_color():
 def test_get_channel_id():
   print("\ntest_get_channel_id")
   print(get_channel_from_db("bet"))
+  print(get_channel_from_db("match"))
 
   
   

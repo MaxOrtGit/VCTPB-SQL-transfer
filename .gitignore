@@ -1,2 +1,3 @@
-vst/*.db
-vst/savedata.db-journal
+*.db
+*.db-journal
+*.ini
