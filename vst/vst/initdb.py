@@ -1,7 +1,7 @@
 from decimal import Decimal
 from multiprocessing import connection
 from xmlrpc.client import Boolean
-from savefiles import get_setting
+from savefiles import get_setting, get_file
 from olddbinterface import get_all_objects
 from dbinterface import *
 from oldcolorinterface import get_all_colors_key_hex
@@ -15,6 +15,7 @@ from Color import Color
 from DBUser import User, is_valid_user
 from DBBet import Bet, is_valid_bet
 from DBMatch import Match, is_valid_match
+from Channels import Channels
 
 def create_db():
   
@@ -101,6 +102,7 @@ def files_to_db():
     dbuser = User(user.code, user.username, user.color, user.show_on_lb, user.balance, user.active_bet_ids, user.loans)
     dbusers.append(dbuser)
     
+    Channels(get_file("bet_channel_id"), get_file("match_channel_id"))
     
     
   with Session.begin() as session:
