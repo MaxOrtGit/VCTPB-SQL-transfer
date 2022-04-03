@@ -191,6 +191,33 @@ def test_relat_get_match():
     print(bets)
   
 
+def test_get_the_set():
+  print("\ntest_get_the_set")
+  
+  with Session.begin() as session:
+    matches = get_all_db("Match", session)
+    
+    match = matches[-1]
+    
+    bet = match.bets[0]
+    
+    print(bet.color_hex)
+    bet.color_hex = "123456"
+    print(bet.color_hex)
+    
+    matchesd = get_all_db("Match", session)
+    
+    matchd = matchesd[-1]
+    
+    betd = matchd.bets[0]
+    
+    print(betd.color_hex)
+    
+    
+
+
+
+
 
 
 def test_get_color():
@@ -330,6 +357,7 @@ test_delete_match()
 test_relat_ctp()
 test_relat_ptc()
 test_relat_get_match()
+test_get_the_set()
 
 
 test_get_color()
