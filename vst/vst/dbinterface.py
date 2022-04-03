@@ -91,6 +91,16 @@ def get_channel_from_db(channel_name, session=None):
     return channels.match_channel_id
   else:
     return None
+  
+def set_channel_in_db(channel_name, channel_value, session=None):
+  if session is None:
+    with Session.begin() as session:
+      return set_channel_in_db(channel_name, channel_value, session)
+  channels = session.scalars(select(Channels)).one()
+  if channel_name == "bet":
+    channels.bet_channel_id = channel_value
+  elif channel_name == "match":
+    channels.match_channel_id = channel_value
                            
                           
 def get_setting(setting_name):
@@ -98,4 +108,3 @@ def get_setting(setting_name):
   configur = ConfigParser()
   configur.read('settings.ini')
   return configur.get("settings", setting_name)
-  

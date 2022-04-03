@@ -1,4 +1,3 @@
-from savefiles import get_setting
 import os
 from initdb import *
 import sqlalchemy
@@ -20,7 +19,7 @@ else:
 if False:
   quit()
 
-from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, get_setting
+from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting
 
 
 
@@ -35,6 +34,7 @@ def test_get():
 
   match = get_from_db("Match", match_codes[1])
   print(match)
+  
 
 
 def test_get_mult():
@@ -301,6 +301,15 @@ def test_get_channel_id():
   print(get_channel_from_db("bet"))
   print(get_channel_from_db("match"))
 
+
+def test_set_channel_id():
+  print("\ntest_set_setting")
+  
+  print(get_channel_from_db("bet"))
+  set_channel_in_db("bet", "123456789")
+  print(get_channel_from_db("bet"))
+  
+
 def test_get_setting():
   print("\ntest_get_setting")
   #setting_names: "discord_token", "github_token", "guild_ids", "override_savedata", "save_repo"
@@ -309,10 +318,13 @@ def test_get_setting():
     print(f"{setting}: {get_setting(setting)}")
   
 
+  
+  
+
 test_get()
 test_get_mult()
 test_is_key_in_db()
-#test_delete_match()
+test_delete_match()
 #test_delete_bet()
 #test_delete_user()
 test_relat_ctp()
@@ -330,4 +342,5 @@ test_delete_color()
 
 
 test_get_channel_id()
+test_set_channel_id()
 test_get_setting()
