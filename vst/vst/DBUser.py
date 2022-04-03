@@ -25,6 +25,7 @@ class User():
   color_hex = Column(String(6), nullable=False)
   hidden = Column(BOOLEAN, nullable=False)
   balances = Column(MutableList.as_mutable(JSONLIST), nullable=False) #array of Tuple(bet_id, balance after change, date)
+  have under connected
   active_bet_ids = Column(MutableList.as_mutable(JSONLIST), nullable=False) #array of strings code of active bets
   loans = Column(MutableList.as_mutable(JSONLIST), nullable=False) #array of Tuple(balance, date created, date paid)
   bets = relationship("Bet", back_populates="user", cascade="all, delete")
