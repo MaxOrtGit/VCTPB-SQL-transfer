@@ -24,7 +24,7 @@ else:
 if False:
   quit()
 
-from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db
+from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db
 
 
 
@@ -299,6 +299,10 @@ def test_delete_color():
     print(match.color_hex)
     
     
+    
+def test_get_channel_id():
+  print("\ntest_get_channel_id")
+  print(get_channel_from_db("bet"))
 
   
   
@@ -322,4 +326,6 @@ print("\n\n\n\n\n")
 test_add_color_to_match()
 test_delete_color()
 
+
+test_get_channel_id()
 

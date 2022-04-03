@@ -102,7 +102,7 @@ def files_to_db():
     dbuser = User(user.code, user.username, user.color, user.show_on_lb, user.balance, user.active_bet_ids, user.loans)
     dbusers.append(dbuser)
     
-    Channels(get_file("bet_channel_id"), get_file("match_channel_id"))
+    channel = Channels(get_file("bet_channel_id"), get_file("match_channel_id"))
     
     
   with Session.begin() as session:
@@ -110,6 +110,7 @@ def files_to_db():
     session.add_all(dbbets)
     session.add_all(dbusers)
     session.add_all(dbcolors)
+    session.add(channel)
   
   
   
