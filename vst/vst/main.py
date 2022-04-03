@@ -306,7 +306,7 @@ def test_set_channel_id():
   print("\ntest_set_setting")
   
   print(get_channel_from_db("bet"))
-  set_channel_in_db("bet", "123456789")
+  set_channel_in_db("bet", 123456789)
   print(get_channel_from_db("bet"))
   
 
