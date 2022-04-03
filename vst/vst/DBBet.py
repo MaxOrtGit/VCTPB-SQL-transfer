@@ -21,7 +21,7 @@ class Bet():
   team_num = Column(Integer, nullable=False)
   color_name = Column(String(32), ForeignKey("color.name"))
   color = relationship("Color", back_populates="bets")
-  color_code = Column(String(6), nullable=False)
+  color_hex = Column(String(6), nullable=False)
   match_id = Column(String(8), ForeignKey("match.code"), nullable=False)
   match = relationship("Match", back_populates="bets")
   user_id = Column(Integer, ForeignKey("user.code"), nullable=False)
@@ -70,12 +70,12 @@ class Bet():
     if isinstance(color, str):
       self.color = None
       self.color_name = None
-      self.color_code = color
+      self.color_hex = color
       return
+    
     self.color = color
-    print(self.color_name, self.color.name)
     self.color_name = color.name
-    self.color_code = color.code
+    self.color_hex = color.code
   
   def __repr__(self):
     return f"<Bet {self.code}>"

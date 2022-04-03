@@ -23,7 +23,7 @@ class User():
   username = Column(String(32), nullable=False)
   color_name = Column(String(32), ForeignKey("color.name"))
   color = relationship("Color", back_populates="users")
-  color_code = Column(String(6), nullable=False)
+  color_hex = Column(String(6), nullable=False)
   hidden = Column(BOOLEAN, nullable=False)
   balances = Column(JSONLIST, nullable=False) #array of Tuple(bet_id, balance after change, date)
   active_bet_ids = Column(JSONLIST, nullable=False) #array of strings code of active bets
@@ -65,12 +65,12 @@ class User():
     if isinstance(color, str):
       self.color = None
       self.color_name = None
-      self.color_code = color
+      self.color_hex = color
       return
+    
     self.color = color
-    print(self.color_name, self.color.name)
     self.color_name = color.name
-    self.color_code = color.code
+    self.color_hex = color.code
   
   def __repr__(self):
     return f"<User {self.code}>"

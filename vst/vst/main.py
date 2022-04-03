@@ -21,6 +21,8 @@ else:
     quit()
 
 
+if False:
+  quit()
 
 from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db
 
@@ -212,14 +214,14 @@ def test_get_mult_color():
   
   colors = get_all_db("Color")
 
-  color_codes = [color.name for color in colors]
+  color_names = [color.name for color in colors]
 
-  colorss = get_mult_from_db("Color", color_codes[2:8])
+  colorss = get_mult_from_db("Color", color_names[2:8])
   print(colorss)
-  color_codes = [color.name for color in colorss]
+  color_names = [color.name for color in colorss]
 
-  print(color_codes)
-  print(is_key_in_db("Color", color_codes[0]))
+  print(color_names)
+  print(is_key_in_db("Color", color_names[0]))
   print(is_key_in_db("Color", "1234567l"))
 
 
@@ -243,13 +245,70 @@ def test_add_color():
   print(color)
   
   
+def test_add_color_to_match(session = None):
+  if session is None:
+    with Session.begin() as session:
+      print("\ntest_add_color_to_match")
+      return test_add_color_to_match(session)
+  else:
+    matches = get_all_db("Match", session)
+    match = matches[0]
+    print(match, match.color, match.color_hex)
+    color = get_from_db("Color", "Orange", session)
+    
+    add_to_db(color, session)
+    match.set_color(color)
+    
+    match = get_from_db("Match", match.code, session)
+    print(match.color)
+    print(match.color_hex)
+    
+
+def test_delete_color():
+  print("\ntest_delete_color")
+  
+  with Session.begin() as session:
+    matches = get_all_db("Match", session)
+    match = matches[0]
+    
+    if match.color is None:
+      print("-----adding color------")
+      test_add_color_to_match(session)
+      print("-----adding color------")
+    print(match, match.color, match.color_hex)
+    
+    
+    color = get_from_db("Color", "Orange", session)
+    print(color.name)
+    match_codes = [match.code for match in color.matches]
+    print(match_codes)
+    delete_from_db(color, session=session)
+    
+
+    color = get_from_db("Color", "Orange", session)
+    print(color)
+    
+    matchess = get_mult_from_db("Match", match_codes, session)
+    print(matchess)
+    match_colors = [match.color for match in matchess]
+    print(match_colors)
+    match_code = matchess[0].code
+    
+    match = get_from_db("Match", match_code, session)
+    print(match.color)
+    print(match.color_hex)
+    
+    
+
+  
+  
 
 test_get()
 test_get_mult()
 test_is_key_in_db()
-test_delete_match()
-test_delete_bet()
-test_delete_user()
+#test_delete_match()
+#test_delete_bet()
+#test_delete_user()
 test_relat_ctp()
 test_relat_ptc()
 test_relat_get_match()
@@ -259,5 +318,7 @@ test_get_color()
 test_get_mult_color()
 test_is_key_in_db_color()
 test_add_color()
-#add color relation to match
+print("\n\n\n\n\n")
+test_add_color_to_match()
+test_delete_color()
 

@@ -57,6 +57,7 @@ def delete_from_db(ambig, table_name=None, session=None):
         session.delete(ambig)
     else:
       session.delete(ambig)
+  session.expire_all()
     
     
 def add_to_db(obj, session=None):
