@@ -315,7 +315,7 @@ def test_get_setting():
   #setting_names: "discord_token", "github_token", "guild_ids", "override_savedata", "save_repo"
   settings = ["discord_token", "github_token", "guild_ids", "override_savedata", "save_repo"]
   for setting in settings:
-    print(f"{setting}: {get_setting(setting)}")
+    print(f"{setting}: {get_setting(setting)}, {type(get_setting(setting))}")
   
 
   
