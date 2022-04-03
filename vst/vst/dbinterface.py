@@ -66,6 +66,7 @@ def add_to_db(obj, session=None):
       session.add(obj)
   else:
     session.add(obj)
+  session.expire_all()
 
 
 def is_key_in_db(table_name, key, session=None):
