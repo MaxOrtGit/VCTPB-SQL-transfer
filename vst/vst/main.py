@@ -191,8 +191,8 @@ def test_relat_get_match():
     print(bets)
   
 
-def test_get_the_set():
-  print("\ntest_get_the_set")
+def test_get_then_set():
+  print("\test_get_then_set")
   
   with Session.begin() as session:
     matches = get_all_db("Match", session)
@@ -344,8 +344,48 @@ def test_get_setting():
   for setting in settings:
     print(f"{setting}: {get_setting(setting)}, {type(get_setting(setting))}")
   
-
+def ambig_to_obj(ambig, prefix, session=None):
+  if isinstance(ambig, int) or isinstance(ambig, str):
+    obj = get_from_db(prefix, ambig, session)
+  elif isinstance(ambig, User) or isinstance(ambig, Match) or isinstance(ambig, Bet):
+    obj = ambig
+  else:
+    obj = None
+    print(ambig, type(ambig))
+  return obj
   
+def add_balance_user(user_ambig, change, description, date, session=None):
+  if session is None:
+    with Session.begin() as session:
+      return add_balance_user(user_ambig, change, description, date, session=session)
+      
+  user = ambig_to_obj(user_ambig, "User")
+  if user is None:
+    return None
+  user.balances.append((description, Decimal(str(round(user.balances[-1][1] + Decimal(str(change)), 5))), date))
+  user.balances.sort(key=lambda x: x[2])
+  #user.balances = user.balances + []
+  user.color_hex = "eeedee"
+  return user
+
+def test_add_balance_to_user():
+  print("\ntest_add_balance_to_user")
+  
+  with Session.begin() as session:
+    user = get_all_db("User", session)[0]
+    bet_id = "award_" + user.get_unique_code("award_") + "_" + "testttt"
+    print(bet_id)
+    abu = add_balance_user(user, 10, bet_id, get_date(), session)
+    print(str(abu.balances)[-200:], abu.get_balance(), abu.color_hex)
+    print(str(user.balances)[-200:], user.get_balance(), user.color_hex)
+    
+    userer = get_all_db("User", session)[0]
+    print(str(userer.balances)[-200:], userer.get_balance(), userer.color_hex)
+    session.commit()
+  
+  with Session.begin() as session:
+    userer = get_all_db("User", session)[0]
+    print(str(userer.balances)[-200:], userer.get_balance(), userer.color_hex)
   
 
 test_get()
@@ -357,7 +397,7 @@ test_delete_match()
 test_relat_ctp()
 test_relat_ptc()
 test_relat_get_match()
-test_get_the_set()
+test_get_then_set()
 
 
 test_get_color()
@@ -372,3 +412,5 @@ test_delete_color()
 test_get_channel_id()
 test_set_channel_id()
 test_get_setting()
+
+test_add_balance_to_user()
