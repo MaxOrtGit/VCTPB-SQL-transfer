@@ -18,10 +18,6 @@ from DBMatch import Match, is_valid_match
 from Channels import Channels
 
 def create_db():
-  
-  if not get_setting("init_sql_db"):
-    print("savedata.db does not exist.\nquitting")
-    quit()
 
   with Engine.begin() as connection:
     mapper_registry.metadata.create_all(connection)

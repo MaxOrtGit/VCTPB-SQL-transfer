@@ -13,18 +13,14 @@ if os.path.isfile("savedata.db"):
   create_db()
   files_to_db()
 else:
-  if get_setting("init_sql_db"):
-    create_db()
-    files_to_db()
-  else:
-    print("savedata.db does not exist.\nquitting")
-    quit()
+  create_db()
+  files_to_db()
 
 
 if False:
   quit()
 
-from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db
+from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, get_setting
 
 
 
@@ -305,7 +301,12 @@ def test_get_channel_id():
   print(get_channel_from_db("bet"))
   print(get_channel_from_db("match"))
 
-  
+def test_get_setting():
+  print("\ntest_get_setting")
+  #setting_names: "discord_token", "github_token", "guild_ids", "override_savedata", "save_repo"
+  settings = ["discord_token", "github_token", "guild_ids", "override_savedata", "save_repo"]
+  for setting in settings:
+    print(f"{setting}: {get_setting(setting)}")
   
 
 test_get()
@@ -329,4 +330,4 @@ test_delete_color()
 
 
 test_get_channel_id()
-
+test_get_setting()

@@ -10,6 +10,8 @@ from DBBet import Bet
 from Color import Color
 from Channels import Channels
 
+from configparser import ConfigParser
+
 def get_date():
   central = timezone('US/Central')
   return datetime.now(central)
@@ -95,3 +97,10 @@ def get_channel_from_db(channel_name, session=None):
     else:
       return None
                            
+                          
+def get_setting(setting_name):
+  #setting_names: "discord_token", "github_token", "guild_ids", "override_savedata", "save_repo"
+  configur = ConfigParser()
+  configur.read('settings.ini')
+  return configur.get("settings", setting_name)
+  
