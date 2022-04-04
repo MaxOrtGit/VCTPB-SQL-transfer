@@ -56,9 +56,10 @@ def files_to_db():
         error = True
     if error:
       print("Error in match:", match.code)
-      print(ujson.dumps(match))
+      #print(ujson.dumps(match))
       print(list(enumerate(errors)))
       print(list(enumerate([match.code, match.t1, match.t2, match.t1o, match.t2o, match.t1oo, match.t2oo, match.tournament_name, match.odds_source, match.winner, match.color, match.creator, match.date_created, match.date_winner, match.date_closed, match.bet_ids, match.message_ids])))
+      quit()
       return
     
     dbmatch = Match(match.code, match.t1, match.t2, match.t1o, match.t2o, match.t1oo, match.t2oo, match.tournament_name, match.winner, match.odds_source, match.color, match.creator, match.date_created, match.date_winner, match.date_closed, match.bet_ids, match.message_ids)
@@ -73,9 +74,10 @@ def files_to_db():
         error = True
     if error:
       print("Error in bet:", bet.code)
-      print(ujson.dumps(bet))
+      #print(ujson.dumps(bet))
       print(list(enumerate(errors)))
       print(list(enumerate([bet.code, bet.t1, bet.t2, bet.tournament_name, bet.winner, bet.bet_amount, bet.team_num, bet.color, bet.match_id, bet.user_id, bet.date_created, bet.message_ids])))
+      quit()
       return
 
     dbbet = Bet(bet.code, bet.t1, bet.t2, bet.tournament_name, bet.winner, bet.bet_amount, bet.team_num, bet.color, bet.match_id, bet.user_id, bet.date_created, bet.message_ids)
@@ -90,9 +92,10 @@ def files_to_db():
         error = True
     if error:
       print("Error in user:", user.code)
-      print(ujson.dumps(user))
+      #print(ujson.dumps(user))
       print(list(enumerate(errors)))
       print(list(enumerate([user.code, user.username, user.color, user.show_on_lb, user.balance, user.active_bet_ids, user.loans])))
+      quit()
       return
     
     dbuser = User(user.code, user.username, user.color, user.show_on_lb, user.balance, user.active_bet_ids, user.loans)

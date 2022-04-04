@@ -156,10 +156,10 @@ def is_valid_match(code, t1, t2, t1o, t2o, t1oo, t2oo, tournament_name, odds_sou
   if isinstance(date_created, datetime) == False:
     errors[12] = True
     print("date_created", date_created, type(date_created))
-  if isinstance(date_winner, datetime) == False:
+  if isinstance(date_winner, datetime) == False and date_winner is not None:
     errors[13] = True
     print("date_winner", date_winner, type(date_winner))
-  if isinstance(date_closed, datetime) == False:
+  if isinstance(date_closed, datetime) == False and date_closed is not None:
     errors[14] = True
     print("date_closed", date_closed, type(date_closed))
   if isinstance(bet_ids, list) == False:

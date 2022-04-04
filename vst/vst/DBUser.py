@@ -63,7 +63,6 @@ class User():
     self.loans = loans
   
   def set_color(self, color):
-    get_date()
     if isinstance(color, str):
       self.color_name = None
       self.color_hex = color

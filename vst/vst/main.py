@@ -1,7 +1,6 @@
 import os
 from initdb import *
 import sqlalchemy
-import initimport
 print(sqlalchemy.__version__)
 
 print("running")
@@ -17,7 +16,7 @@ else:
   files_to_db()
 
 
-if False:
+if True:
   quit()
 
 from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting
@@ -126,16 +125,24 @@ def test_delete_user():
   with Session.begin() as session:
     users = get_all_db("User", session)
     user = users[0]
-    match = user.matches[0]
-    print(match.creator.username)
-    mcode = match.code
-    bet = match.bets[0]
-    bcode = bet.code
-    print(bet.user.username)
+    ucode = user.code
+    for x in range(10):
+      try:
+        match = user.matches[0]
+        print(match.creator.username)
+        mcode = match.code
+        bet = match.bets[x]
+        bcode = bet.code
+        print(bet.user.username)
+      except:
+        print("no bets")
+      else:
+        print("bet")
+        break
     
     delete_from_db(user, session=session)
-    print(user.code)
-    user = get_from_db("User", user.code, session)
+    print(ucode)
+    user = get_from_db("User", ucode, session)
     
     match = get_from_db("Match", mcode, session)
     bet = get_from_db("Bet", bcode, session)
@@ -192,22 +199,33 @@ def test_relat_get_match():
   
 
 def test_get_then_set():
-  print("\test_get_then_set")
+  print("\ntest_get_then_set")
   
   with Session.begin() as session:
     matches = get_all_db("Match", session)
     
-    match = matches[-1]
     
-    bet = match.bets[0]
+    for match in matches[::-1]:
+      print("get")
+      try:
+        bets = match.bets
+        print(match.code, bets)
+        bet = bets[0]
+        print(bet.color_hex)
+        mcode = match.code
+      except:
+        print("no bets")
+      else:
+        print("found bet")
+        break
+    else:
+      print("no bets found")
     
     print(bet.color_hex)
     bet.color_hex = "123456"
     print(bet.color_hex)
     
-    matchesd = get_all_db("Match", session)
-    
-    matchd = matchesd[-1]
+    matchd = get_from_db("Match", mcode, session)
     
     betd = matchd.bets[0]
     
@@ -375,25 +393,21 @@ def test_add_balance_to_user():
     user = get_all_db("User", session)[0]
     bet_id = "award_" + user.get_unique_code("award_") + "_" + "testttt"
     print(bet_id)
-    abu = add_balance_user(user, 10, bet_id, get_date(), session)
-    print(str(abu.balances)[-200:], abu.get_balance(), abu.color_hex)
     print(str(user.balances)[-200:], user.get_balance(), user.color_hex)
+    abu = add_balance_user(user, 10, bet_id, get_date(), session)
+    print(str(abu.balances)[-200:], user.get_balance(), user.color_hex)
     
     userer = get_all_db("User", session)[0]
     print(str(userer.balances)[-200:], userer.get_balance(), userer.color_hex)
-    session.commit()
-  
-  with Session.begin() as session:
-    userer = get_all_db("User", session)[0]
-    print(str(userer.balances)[-200:], userer.get_balance(), userer.color_hex)
-  
+
+
 
 test_get()
 test_get_mult()
 test_is_key_in_db()
 test_delete_match()
-#test_delete_bet()
-#test_delete_user()
+test_delete_bet()
+test_delete_user()
 test_relat_ctp()
 test_relat_ptc()
 test_relat_get_match()
