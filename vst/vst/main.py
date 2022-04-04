@@ -6,7 +6,7 @@ print(sqlalchemy.__version__)
 print("running")
 
 if os.path.isfile("savedata.db"):
-  print("savedata.db exists")
+  print("savedata.db exists, overwriting")
   #delete savedata.db
   os.remove("savedata.db")
   create_db()
