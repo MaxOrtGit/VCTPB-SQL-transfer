@@ -37,9 +37,7 @@ def files_to_db():
   dbcolors = []
   
   for color in colors:
-    print(color[0].capitalize(), color[1])
     dbcolor = Color(color[0].capitalize(), color[1])
-    print(dbcolor)
     dbcolors.append(dbcolor)
   
   for match in matches:
@@ -84,7 +82,6 @@ def files_to_db():
     dbbets.append(dbbet)
     
   for user in users:
-    print(user.show_on_lb)
     errors = is_valid_user(user.code, user.username, user.color, user.show_on_lb, user.balance, user.active_bet_ids, user.loans)
     error = False
     for e in errors:
