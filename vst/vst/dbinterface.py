@@ -5,11 +5,16 @@ import jsonpickle
 from sqlaobjs import Session
 from sqlalchemy import select
 
-from DBMatch import Match
-from DBUser import User
-from DBBet import Bet
-from Color import Color
-from Channels import Channels
+import DBMatch
+Match = DBMatch.Match
+import DBUser
+User = DBUser.User
+import DBBet 
+Bet = DBBet.Bet
+import Color
+Color = Color.Color
+import Channels
+Channels = Channels.Channels
 
 from configparser import ConfigParser
 
