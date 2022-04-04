@@ -1,6 +1,7 @@
 import os
 from initdb import *
 import sqlalchemy
+import initimport
 print(sqlalchemy.__version__)
 
 print("running")
@@ -20,7 +21,6 @@ if False:
   quit()
 
 from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting
-
 
 
 

@@ -14,6 +14,8 @@ from sqltypes import JSONLIST
 from sqlalchemy.ext.mutable import MutableList
 from sqlaobjs import mapper_registry
 
+  
+  
 @mapper_registry.mapped
 class User():
   __tablename__ = "user"
@@ -61,6 +63,7 @@ class User():
     self.loans = loans
   
   def set_color(self, color):
+    get_date()
     if isinstance(color, str):
       self.color_name = None
       self.color_hex = color
