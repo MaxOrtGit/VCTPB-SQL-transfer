@@ -36,15 +36,11 @@ def get_from_db(table_name, code, session=None):
   return session.get(eval(table_name), code, populate_existing=True)
     
     
-def get_condition_db(obj, condition, session=None):
+def get_condition_db(table_name, condition, session=None):
   if session is None:
     with Session.begin() as session:
-      return get_condition_db(obj, condition, session)
-  if isinstance(obj, str):
-    obj = eval(obj)
-  if isinstance(condition, str):
-    condition = eval(condition)
-  return session.scalars(select(obj).where(condition)).all()   
+      return get_condition_db(table_name, condition, session)
+  return session.scalars(select(eval(table_name)).where(condition)).all()
     
     
 def get_mult_from_db(table_name, codes, session=None):

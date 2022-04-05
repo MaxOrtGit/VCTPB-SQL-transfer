@@ -407,8 +407,7 @@ def test_add_balance_to_user():
 def test_get_condition():
   print("\ntest_get_condition")
   num = "7"
-  print(get_condition_db("Bet", f"Bet.code.startswith('{num}')"))
-  print(get_condition_db(Bet, Bet.code.startswith(num)))
+  print(get_condition_db("Bet", Bet.code.startswith(num)))
 
 
 test_get()
