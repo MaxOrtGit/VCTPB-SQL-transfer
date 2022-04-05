@@ -16,10 +16,10 @@ else:
   files_to_db()
 
 
-if True:
+if False:
   quit()
 
-from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting
+from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting, get_condition_db
 
 
 
@@ -40,14 +40,18 @@ def test_get_mult():
   print("\ntest_get_mult")
   
   matches = get_all_db("Match")
+  bets = get_all_db("Bet")
+  users = get_all_db("User")
+  
+  print(matches)
+  print(bets)
+  print(users)
 
   match_codes = [match.code for match in matches]
 
   matches = get_mult_from_db("Match", match_codes[2:8])
-  print(matches)
   match_codes = [match.code for match in matches]
 
-  print(match_codes)
   print(is_key_in_db("Match", match_codes[0]))
   print(is_key_in_db("Match", "1234567l"))
 
@@ -400,6 +404,11 @@ def test_add_balance_to_user():
     userer = get_all_db("User", session)[0]
     print(str(userer.balances)[-200:], userer.get_balance(), userer.color_hex)
 
+def test_get_condition():
+  print("\ntest_get_condition")
+  
+  print(get_condition_db("Bet", "Bet.code.startswith('7')"))
+  print(get_condition_db(Bet, Bet.code.startswith('7')))
 
 
 test_get()
@@ -418,7 +427,6 @@ test_get_color()
 test_get_mult_color()
 test_is_key_in_db_color()
 test_add_color()
-print("\n\n\n\n\n")
 test_add_color_to_match()
 test_delete_color()
 
@@ -428,3 +436,4 @@ test_set_channel_id()
 test_get_setting()
 
 test_add_balance_to_user()
+test_get_condition()
