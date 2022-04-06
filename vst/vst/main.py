@@ -445,7 +445,7 @@ def test_user_open_matches():
     print(user.open_matches)
     match.winner = 1
     
-    print(user.open_matches)
+    print(match.winner)
     
     session.flush([match])
     session.expire(user)
