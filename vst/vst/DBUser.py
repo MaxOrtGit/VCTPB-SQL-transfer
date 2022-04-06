@@ -78,7 +78,6 @@ class User():
       split = bal[0].split("_")
       if len(split) > 1:
         codes.append(split[1])
-    print(codes)
     for code in codes:
       if len(code) != 8:
         print(code)
