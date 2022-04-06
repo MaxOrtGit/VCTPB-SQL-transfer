@@ -19,7 +19,7 @@ else:
 if False:
   quit()
 
-from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting, get_condition_db
+from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting, get_condition_db, get_date_string
 
 
 
@@ -128,7 +128,7 @@ def test_delete_user():
   print("\ntest_delete_user")
   with Session.begin() as session:
     users = get_all_db("User", session)
-    user = users[0]
+    user = users[-1]
     ucode = user.code
     for x in range(10):
       try:
@@ -410,12 +410,35 @@ def test_get_condition():
   print(get_condition_db("Bet", Bet.code.startswith(num)))
 
 
+def test_user_active_bets():
+  print("\ntest_user_active_bets")
+  
+  with Session.begin() as session:
+    user = get_all_db("User", session)[0]
+    user.bets[-1].winner = 0
+    user.bets[-2].winner = 0
+    user.bets[-3].winner = 0
+    user.bets[-4].winner = 0
+    print(user.active_bets)
+    active_bets = user.active_bets
+    user.bets[-4].winner = 1
+    session.flush()
+    session.expire_all()
+    print(active_bets)
+    print(user.active_bets, "diff")
+    
+  with Session.begin() as session:
+    user = get_all_db("User", session)[0]
+    print(user.active_bets)
+    
+
+
 test_get()
 test_get_mult()
 test_is_key_in_db()
-test_delete_match()
-test_delete_bet()
-test_delete_user()
+#test_delete_match()
+#test_delete_bet()
+#test_delete_user()
 test_relat_ctp()
 test_relat_ptc()
 test_relat_get_match()
@@ -437,3 +460,4 @@ test_get_setting()
 test_add_balance_to_user()
 
 test_get_condition()
+test_user_active_bets()

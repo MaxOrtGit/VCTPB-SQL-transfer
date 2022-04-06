@@ -17,8 +17,10 @@ def get_date():
   central = timezone('US/Central')
   return datetime.now(central)
 
-def get_date_string():
-  return get_date().strftime("%Y-%m-%d-%H-%M-%S")
+def get_date_string(date=None):
+  if date is None:
+    date = get_date()
+  return date.strftime("%Y-%m-%d-%H-%M-%S")
 
 
 
@@ -78,6 +80,7 @@ def add_to_db(obj, session=None):
     with Session.begin() as session:
       return add_to_db(obj, session)
   session.add(obj)
+  session.flush()
   session.expire_all()
 
 

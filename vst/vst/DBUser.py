@@ -28,8 +28,9 @@ class User():
   hidden = Column(BOOLEAN, nullable=False)
   balances = Column(MutableList.as_mutable(JSONLIST), nullable=False) #array of Tuple(bet_id, balance after change, date)
   active_bet_ids = Column(MutableList.as_mutable(JSONLIST), nullable=False) #array of strings code of active bets
+  active_bets = relationship("Bet", primaryjoin="and_(Bet.user_id == User.code, Bet.winner == 0)", overlaps="active_bets, user", cascade="all, delete")
   loans = Column(MutableList.as_mutable(JSONLIST), nullable=False) #array of Tuple(balance, date created, date paid)
-  bets = relationship("Bet", back_populates="user", cascade="all, delete")
+  bets = relationship("Bet", back_populates="user", cascade="all, delete", overlaps="active_bets, user")
   matches = relationship("Match", back_populates="creator")
   
   def __init__(self, code, username, color, date_created):
@@ -72,7 +73,7 @@ class User():
     self.color_hex = color.hex
   
   def __repr__(self):
-    return f"<User {self.code}>"
+    return f"<User {self.code}, {self.username}>"
 
   def get_unique_code(self, prefix):
     #combine all_bal into one array
