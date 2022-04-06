@@ -395,7 +395,7 @@ def test_add_balance_to_user():
   
   with Session.begin() as session:
     user = get_all_db("User", session)[0]
-    bet_id = "award_" + user.get_unique_code("award_") + "_" + "testttt"
+    bet_id = "award_" + user.get_unique_code() + "_" + "testttt"
     print(bet_id)
     print(str(user.balances)[-200:], user.get_balance(), user.color_hex)
     abu = add_balance_user(user, 10, bet_id, get_date(), session)
@@ -406,8 +406,8 @@ def test_add_balance_to_user():
 
 def test_get_condition():
   print("\ntest_get_condition")
-  num = "7"
-  print(get_condition_db("Bet", Bet.code.startswith(num)))
+  hex = "a"
+  print(get_condition_db("Bet", Bet.code.startswith(hex)))
 
 
 def test_user_active_bets():
@@ -428,25 +428,38 @@ def test_user_active_bets():
 
     print(bet.winner)
     session.flush([bet])
-    session.refresh(user)
-    #session.flush([user.bets[-4]])
-    #session.expire(user)
+    session.expire(user)
     print(user.active_bets, "diff")
     
+def test_user_open_matches():
+  print("\ntest_user_open_matches")
+  
   with Session.begin() as session:
     user = get_all_db("User", session)[0]
-    print(user.active_bets)
+    user.matches[-1].winner = 0
+    user.matches[-2].winner = 0
+    match = user.matches[-3]
+    
+    match.winner = 0
+    
+    print(user.open_matches)
+    match.winner = 1
+    
+    print(user.open_matches)
+    
+    session.flush([match])
+    session.expire(user)
+    print(user.open_matches, "diff")
+    
     
 
-test_user_active_bets()
-quit()
 
 test_get()
 test_get_mult()
 test_is_key_in_db()
-#test_delete_match()
-#test_delete_bet()
-#test_delete_user()
+test_delete_match()
+test_delete_bet()
+test_delete_user()
 test_relat_ctp()
 test_relat_ptc()
 test_relat_get_match()
@@ -469,3 +482,4 @@ test_add_balance_to_user()
 
 test_get_condition()
 test_user_active_bets()
+test_user_open_matches()
