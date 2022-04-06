@@ -12,10 +12,8 @@ from sqlalchemy import Column, String, BOOLEAN, ForeignKey
 from sqlalchemy.orm import relationship
 from sqltypes import JSONLIST
 from sqlalchemy.ext.mutable import MutableList
-from sqlaobjs import mapper_registry
+from sqlaobjs import mapper_registry, Session
 
-  
-  
 @mapper_registry.mapped
 class User():
   __tablename__ = "user"
@@ -27,7 +25,6 @@ class User():
   color_hex = Column(String(6), nullable=False)
   hidden = Column(BOOLEAN, nullable=False)
   balances = Column(MutableList.as_mutable(JSONLIST), nullable=False) #array of Tuple(bet_id, balance after change, date)
-  active_bet_ids = Column(MutableList.as_mutable(JSONLIST), nullable=False) #array of strings code of active bets
   active_bets = relationship("Bet", primaryjoin="and_(Bet.user_id == User.code, Bet.winner == 0)", overlaps="active_bets, user", cascade="all, delete")
   loans = Column(MutableList.as_mutable(JSONLIST), nullable=False) #array of Tuple(balance, date created, date paid)
   bets = relationship("Bet", back_populates="user", cascade="all, delete", overlaps="active_bets, user")
@@ -42,25 +39,22 @@ class User():
     #a tuple (bet_id, balances after change, date)
     #if change is None then it is a reset
     #bet_id = id_[bet_id]: bet id
-    #bet_id = award_[award_id]: awards
+    #bet_id = award_[award_id]_[name]: awards
     #bet_id = start: start balances
-    #bet_id = reset_[reset_name]: changed balances with command
+    #bet_id = reset_[reset_id]_[reset_name]: changed balances with command
     
     self.balances = [("start", Decimal(500), date_created)]
-    
-    self.active_bet_ids = []
 
     #a tuple (balances, date created, date paid)
     
     self.loans = []
 
-  def __init__(self, code, username, color, hidden, balances, active_bet_ids, loans):
+  def __init__(self, code, username, color, hidden, balances, loans):
     self.code = code
     self.username = username
     self.set_color(color)
     self.hidden = hidden
     self.balances = balances
-    self.active_bet_ids = active_bet_ids
     self.loans = loans
   
   def set_color(self, color):
@@ -76,9 +70,25 @@ class User():
     return f"<User {self.code}, {self.username}>"
 
   def get_unique_code(self, prefix):
+    #test
+    #test
+    #test
+    #test
+    #test
+    #test
+    #test
     #combine all_bal into one array
     prefix_bal = [x for x in self.balances if x[0].startswith(prefix)]
     codes = [bal[0][len(prefix):len(prefix)+8] for bal in prefix_bal]
+    for bal in self.balances:
+      split = bal.split("_")
+      if len(split) > 1:
+        codes.append(split[1])
+    print(codes)
+    for code in codes:
+      if len(code) != 8:
+        print(code)
+        quit()
     code = ""
     copy = True
     while copy:
@@ -91,11 +101,6 @@ class User():
           copy = True
     return code
 
-  def active_bet_ids_bets(self):
-    return [active_id[0] for active_id in self.active_bet_ids]
-
-  def active_bet_ids_matches(self):
-    return [active_id[1] for active_id in self.active_bet_ids]
   
   def get_open_loans(self):
     open_loans = []
@@ -105,7 +110,6 @@ class User():
     return open_loans
 
   def loan_bal(self):
-
     loan_amount = 0
     loans = self.get_open_loans()
     if loans == 0:
@@ -115,32 +119,30 @@ class User():
     
     return loan_amount
 
-  def unavailable(self):
+  def unavailable(self, session=None):
+    if session is None:
+      with Session.begin() as session:
+        return self.unavailable(session)
+      
     used = 0
-    active_bet_ids_bets = self.active_bet_ids_bets()
-    for bet_id in active_bet_ids_bets:
-      temp_bet = get_from_list("Bet", bet_id)
-      if temp_bet is None:
-        ids = [t for t in self.active_bet_ids if bet_id == t[0]]
-        for id in ids:
-          self.active_bet_ids.remove(id)
-        replace_in_list("User", self.code, self)
-        continue
-      used += temp_bet.amount_bet
+    bets = self.active_bets
+    
+    for bet in bets:
+      used += bet.amount_bet
 
     return used
 
-  def get_balance(self):
+  def get_balance(self, session=None):
     bal = self.balances[-1][1]
-    bal -= self.unavailable()
+    bal -= self.unavailable(session)
     bal += self.loan_bal()
     return bal
 
   def get_clean_bal_loan(self):
     return self.balances[-1][1] + self.loan_bal()
 
-  def avaliable_nonloan_bal(self):
-    return self.balances[-1][1] - self.unavailable()
+  def avaliable_nonloan_bal(self, session=None):
+    return self.balances[-1][1] - self.unavailable(session)
 
   def get_resets(self):
     return [i for i, x in enumerate(self.balances) if x[0].startswith("reset_")]
@@ -176,16 +178,35 @@ class User():
         break
     replace_in_list("User", self.code, self)
 
-  def change_award_name(self, award_label, name):
+  def change_award_name(self, award_label, name, session=None):
+    if session is None:
+      with Session.begin() as session:
+        self.change_award_name(award_label, name, session=session)
     for balance in self.balances:
       if balance[0].startswith("award_") and balance[0][6:14] == award_label[-8:]:
         self.balances[self.balances.index(balance)] = (balance[0][:15] + name, balance[1], balance[2])
         break
     else:
       return None
-    replace_in_list("User", self.code, self)
     return self
   
+  
+  def get_award_strings(self):
+    last_amount = Decimal(0)
+    awards_id_changes = []
+    for balance_t in self.balances:
+      if balance_t[0].startswith("award"):
+        awards_id_changes.append((balance_t[0], balance_t[1]-last_amount))
+      last_amount = balance_t[1]
+    
+    award_labels = []
+    for awards_id_change in awards_id_changes:
+      label = f"{awards_id_change[0][15:]}, {math.floor(awards_id_change[1])}, ID: {awards_id_change[0][6:14]}"
+      if len(label) >= 99:
+        label = f"{awards_id_change[0][15:80]}..., {math.floor(awards_id_change[1])}, ID: {awards_id_change[0][6:14]}"
+      award_labels.append(label)
+      
+    return award_labels
   
   def get_new_balance_changes_embeds(self, amount):
     if amount <= 0:
@@ -678,7 +699,7 @@ def num_of_bal_with_name(name, users):
   return num
 
 
-def is_valid_user(code, username, color, hidden, balances, active_bet_ids, loans):
+def is_valid_user(code, username, color, hidden, balances, loans):
   errors = [False for _ in range(7)]
   if isinstance(code, int) == False or len(str(code)) > 20:
     errors[0] = True
@@ -690,9 +711,7 @@ def is_valid_user(code, username, color, hidden, balances, active_bet_ids, loans
     errors[3] = True
   if isinstance(balances, list) == False:
     errors[4] = True
-  if isinstance(active_bet_ids, list) == False:
-    errors[5] = True
+  errors[5] = True
   if isinstance(loans, list) == False:
     errors[6] = True
   return errors
-

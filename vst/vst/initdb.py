@@ -82,7 +82,7 @@ def files_to_db():
     dbbets.append(dbbet)
     
   for user in users:
-    errors = is_valid_user(user.code, user.username, user.color, user.show_on_lb, user.balance, user.active_bet_ids, user.loans)
+    errors = is_valid_user(user.code, user.username, user.color, user.show_on_lb, user.balance, user.loans)
     error = False
     for e in errors:
       if e:
@@ -91,11 +91,11 @@ def files_to_db():
       print("Error in user:", user.code)
       #print(ujson.dumps(user))
       print(list(enumerate(errors)))
-      print(list(enumerate([user.code, user.username, user.color, user.show_on_lb, user.balance, user.active_bet_ids, user.loans])))
+      print(list(enumerate([user.code, user.username, user.color, user.show_on_lb, user.balance, user.loans])))
       quit()
       return
     
-    dbuser = User(user.code, user.username, user.color, user.show_on_lb, user.balance, user.active_bet_ids, user.loans)
+    dbuser = User(user.code, user.username, user.color, user.show_on_lb, user.balance, user.loans)
     dbusers.append(dbuser)
     
     channel = Channels(get_file("bet_channel_id"), get_file("match_channel_id"))
