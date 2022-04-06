@@ -1,4 +1,4 @@
-from sqlalchemy.types import TypeDecorator, VARCHAR, String
+from sqlalchemy.types import TypeDecorator, VARCHAR, String, Integer
 import pickle
 from decimal import Decimal
 import time
@@ -43,3 +43,18 @@ class DECIMAL(TypeDecorator):
       value
     return Decimal(value)
   
+
+  class WINNERINT(TypeDecorator):
+    
+      impl = Integer
+    
+      def load_dialect_impl(self, dialect):
+        return Integer
+    
+      def process_bind_param(self, value, dialect):
+        return Integer
+    
+      def process_result_value(self, value, dialect):
+        if value is not None:
+          value
+        return int(value)

@@ -415,16 +415,22 @@ def test_user_active_bets():
   
   with Session.begin() as session:
     user = get_all_db("User", session)[0]
+    #print(user.active_bets)
     user.bets[-1].winner = 0
     user.bets[-2].winner = 0
     user.bets[-3].winner = 0
-    user.bets[-4].winner = 0
+    bet = user.bets[-4]
+
+    bet.winner = 0
+
     print(user.active_bets)
-    active_bets = user.active_bets
-    user.bets[-4].winner = 1
-    session.flush()
-    session.expire_all()
-    print(active_bets)
+    bet.winner = 1
+
+    print(bet.winner)
+    session.flush([bet])
+    session.refresh(user)
+    #session.flush([user.bets[-4]])
+    #session.expire(user)
     print(user.active_bets, "diff")
     
   with Session.begin() as session:
@@ -432,6 +438,8 @@ def test_user_active_bets():
     print(user.active_bets)
     
 
+test_user_active_bets()
+quit()
 
 test_get()
 test_get_mult()
