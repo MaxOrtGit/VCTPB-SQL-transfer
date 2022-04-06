@@ -30,7 +30,6 @@ class User():
   active_bets = relationship("Bet", primaryjoin="and_(Bet.winner == 0, Bet.user_id == User.code)", overlaps="bets, user, open_matches", cascade="all, delete")
   matches = relationship("Match", back_populates="creator", overlaps="open_matches, creator")
   open_matches = relationship("Match", secondary="join(Bet, Match, not Bet.match_id == Match.code)", primaryjoin="and_(Match.winner == 0, Bet.user_id == User.code)", overlaps="matches, creator", viewonly=True)
-  #open_matches = relationship("Match", secondary="join(Bet, Match, (not foreign(Bet.match_id) == Match.code))", primaryjoin="and_(Match.winner == 0, foreign(Bet.user_id) == User.code)", overlaps="matches, creator", cascade="all, delete")
   
   def __init__(self, code, username, color, date_created):
     self.code = code
