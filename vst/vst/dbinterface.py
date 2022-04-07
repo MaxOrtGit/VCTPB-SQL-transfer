@@ -22,7 +22,14 @@ def get_date_string(date=None):
     date = get_date()
   return date.strftime("%Y-%m-%d-%H-%M-%S")
 
-
+async def delete_all_messages(ids, bot):
+  for id in ids:
+    try:
+      channel = await bot.fetch_channel(id[1])
+      msg = await channel.fetch_message(id[0])
+      await msg.delete()
+    except Exception:
+      print(id, "no msg found")
 
 def get_all_db(table_name, session=None):
   if session is None:
@@ -67,21 +74,23 @@ def get_mult_from_db(table_name, codes, session=None):
     return session.scalars(select(obj).where(obj.code.in_(codes))).all()
 
 
-def delete_from_db(ambig, table_name=None, session=None):
+async def delete_from_db(ambig, bot=None, table_name=None, session=None):
   #wont update relationships
   if isinstance(ambig, str) or isinstance(ambig, int):
-    code = ambig
-    if session is None:
-      with Session.begin() as session:
-        session.delete(session.get(eval(table_name), code))
-    else:
-      session.delete(session.get(eval(table_name), code))
-  else:
-    if session is None:
-      with Session.begin() as session:
-        session.delete(ambig)
-    else:
-      session.delete(ambig)
+    return delete_from_db(session.get(eval(table_name), ambig), bot, session=session)
+  
+  if session is None:
+    with Session.begin() as session:
+      return delete_from_db(ambig, bot, session=session)
+    
+  if bot is not None:
+    if isinstance(ambig, Match):
+      for bet in ambig.bet:
+        await delete_all_messages(bet.message_ids)
+      await delete_all_messages(ambig.message_ids)
+    elif isinstance(ambig, Bet):
+      await delete_all_messages(ambig.message_ids)
+  session.delete(ambig)
   #session.expire_all()
     
     
