@@ -19,7 +19,7 @@ else:
 if False:
   quit()
 
-from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting, get_condition_db, get_date_string
+from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting, get_condition_db, get_date_string, get_new_db
 
 
 
@@ -451,7 +451,19 @@ def test_user_open_matches():
     session.expire(user)
     print(user.open_matches, "diff")
     
+def test_get_new_db():
+  print("\ntest_get_new_db")
+  
+  with Session.begin() as session:
+    match = get_new_db("Match", session)
+    print(match.date_created)
     
+    matches = get_all_db("Match", session)
+    newest_date = matches[0].date_created
+    for match in matches:
+      if match.date_created > newest_date:
+        newest_date = match.date_created
+    print(newest_date)
 
 
 test_get()
@@ -483,3 +495,5 @@ test_add_balance_to_user()
 test_get_condition()
 test_user_active_bets()
 test_user_open_matches()
+
+test_get_new_db()
