@@ -22,6 +22,7 @@ def get_date_string(date=None):
     date = get_date()
   return date.strftime("%Y-%m-%d-%H-%M-%S")
 
+
 async def delete_all_messages(ids, bot):
   for id in ids:
     try:
@@ -30,6 +31,7 @@ async def delete_all_messages(ids, bot):
       await msg.delete()
     except Exception:
       print(id, "no msg found")
+
 
 def get_all_db(table_name, session=None):
   if session is None:
@@ -109,7 +111,14 @@ def is_key_in_db(table_name, key, session=None):
     with Session.begin() as session:
       return is_key_in_db(table_name, key, session)
   return session.get(eval(table_name), key, populate_existing=True) is not None
-      
+
+
+def is_condition_in_db(table_name, condition, session=None):
+  if session is None:
+    with Session.begin() as session:
+      return is_condition_in_db(table_name, condition, session)
+  return session.execute(select(eval(table_name)).where(condition)).first() is not None
+
       
 def get_channel_from_db(channel_name, session=None):
   if session is None:
@@ -123,6 +132,7 @@ def get_channel_from_db(channel_name, session=None):
     return channels.match_channel_id
   else:
     return None
+  
   
 def set_channel_in_db(channel_name, channel_value, session=None):
   if session is None:

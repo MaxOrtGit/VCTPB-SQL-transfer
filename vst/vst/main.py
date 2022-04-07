@@ -1,7 +1,6 @@
 import os
 from initdb import *
-import sqlalchemy
-print(sqlalchemy.__version__)
+from sqlalchemy import and_
 
 print("running")
 
@@ -19,7 +18,7 @@ else:
 if False:
   quit()
 
-from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting, get_condition_db, get_date_string, get_new_db
+from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting, get_condition_db, get_date_string, get_new_db, is_condition_in_db
 
 
 
@@ -465,6 +464,14 @@ def test_get_new_db():
         newest_date = match.date_created
     print(newest_date)
 
+def test_is_condition_in_db():
+  print("\ntest_is_condition_in_db")
+  
+  with Session.begin() as session:
+    match = get_all_db("Match", session)[3]
+    print(is_condition_in_db("Match", (Match.t1 == match.t1) & (Match.t2 == match.t2), session))
+    print(is_condition_in_db("Match", (Match.t1 == match.t1) & (Match.t2 == match.t2 + "h"), session))
+
 
 test_get()
 test_get_mult()
@@ -497,3 +504,4 @@ test_user_active_bets()
 test_user_open_matches()
 
 test_get_new_db()
+test_is_condition_in_db()
