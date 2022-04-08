@@ -19,7 +19,7 @@ if False:
   quit()
 
 from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting, get_condition_db, get_date_string, get_new_db, is_condition_in_db
-
+from time import time
 
 
 
@@ -472,6 +472,64 @@ def test_is_condition_in_db():
     print(is_condition_in_db("Match", (Match.t1 == match.t1) & (Match.t2 == match.t2), session))
     print(is_condition_in_db("Match", (Match.t1 == match.t1) & (Match.t2 == match.t2 + "h"), session))
 
+def test_get_speed():
+  print("\ntest_get_speed")
+  
+  startTime = time()
+  with Session.begin() as session:
+    matches = get_all_db("Match", session)
+    match_codes = [match.code for match in matches[:20]]
+  endTime = time()
+  
+  print(endTime - startTime)
+  
+  startTime = time()
+  with Session.begin() as session:
+    matches = []
+    for match_code in match_codes:
+      matches.append(get_from_db("Match", match_code, session))
+  endTime = time()
+  
+  print(endTime - startTime)
+  
+  startTime = time()
+  with Session.begin() as session:
+    matches = get_mult_from_db("Match", match_codes, session)
+  endTime = time()
+  
+  print(endTime - startTime)
+  
+  
+def test_parent_speeds():
+  print("\ntest_parent_speeds")
+  
+  with Session.begin() as session:
+    bets = get_all_db("Bet", session)[:20]
+
+    startTime = time()
+    
+    matches = []
+    for bet in bets:
+      matches.append(bet.match)
+      
+    endTime = time()
+    
+    print(endTime - startTime)
+    session.expire_all()
+    
+  with Session.begin() as session:
+    bets = get_all_db("Bet", session)[:20]
+    
+    startTime = time()
+    match_ids = [bet.match_id for bet in bets]
+    matches = get_mult_from_db("Match", match_ids, session)
+    
+    endTime = time()
+    
+    print(endTime - startTime)
+  
+  
+  
 
 test_get()
 test_get_mult()
@@ -505,3 +563,6 @@ test_user_open_matches()
 
 test_get_new_db()
 test_is_condition_in_db()
+
+test_get_speed()
+test_parent_speeds()
