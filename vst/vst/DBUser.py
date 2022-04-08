@@ -36,7 +36,7 @@ class User():
     self.username = username
     self.set_color(color)
     
-    self.hidden = True
+    self.hidden = False
     #a tuple (bet_id, balances after change, date)
     #if change is None then it is a reset
     #bet_id = id_[bet_id]: bet id
@@ -54,7 +54,7 @@ class User():
     self.code = code
     self.username = username
     self.set_color(color)
-    self.hidden = hidden
+    self.hidden = not hidden
     self.balances = balances
     self.loans = loans
   
