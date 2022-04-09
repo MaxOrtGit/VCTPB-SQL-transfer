@@ -8,7 +8,8 @@ import random
 import math
 import secrets
 import sys
-from sqlalchemy import Column, String, BOOLEAN, ForeignKey
+from sqlalchemy import Column, String, BOOLEAN, ForeignKey, Integer
+from sqlalchemy.sql import text
 from sqlalchemy.orm import relationship
 from sqltypes import JSONLIST
 from sqlalchemy.ext.mutable import MutableList
@@ -18,7 +19,7 @@ from sqlaobjs import mapper_registry, Session
 class User():
   __tablename__ = "user"
   
-  code = Column(String(8), primary_key=True)
+  code = Column(Integer, primary_key=True)
   username = Column(String(32), nullable=False)
   color_name = Column(String(32), ForeignKey("color.name"))
   color = relationship("Color", back_populates="users")
@@ -29,8 +30,8 @@ class User():
   bets = relationship("Bet", back_populates="user", cascade="all, delete", overlaps="active_bets, user, open_matches")
   active_bets = relationship("Bet", primaryjoin="and_(Bet.winner == 0, Bet.user_id == User.code)", overlaps="bets, user, open_matches", cascade="all, delete")
   matches = relationship("Match", back_populates="creator", overlaps="open_matches, creator")
-  open_matches = relationship("Match", secondary="join(Bet, Match, not Bet.match_id == Match.code)", primaryjoin="and_(Match.winner == 0, Bet.user_id == User.code)", overlaps="matches, creator", viewonly=True)
   
+    
   def __init__(self, code, username, color, date_created):
     self.code = code
     self.username = username
@@ -70,6 +71,28 @@ class User():
   def __repr__(self):
     return f"<User {self.code}, {self.username}>"
 
+  def open_matches(self, session=None):
+    if session is None:
+      with Session.begin() as session:
+        return self.open_matches(session)
+    
+    from dbinterface import get_condition_db
+    
+    open_match_codes = [(match, match.code) for match in get_condition_db("Match", "Match.date_closed == None", session)]
+    active_bets = self.active_bets
+    print(active_bets)
+    open_match_list = []
+    #enumerate active bets
+    for match, code in open_match_codes:
+      not_in_match = True
+      for bet in active_bets:
+        if bet.match_id == code:
+          not_in_match = False
+      if not_in_match:
+        open_match_list.append(match)
+      
+    return open_match_list
+  
   def get_unique_code(self):
     #combine all_bal into one array
     codes = []

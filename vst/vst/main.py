@@ -15,7 +15,7 @@ else:
   files_to_db()
 
 
-if True:
+if False:
   quit()
 
 from dbinterface import get_from_db, get_all_db, get_mult_from_db, delete_from_db, add_to_db, is_key_in_db, get_channel_from_db, set_channel_in_db, get_setting, get_condition_db, get_date_string, get_new_db, is_condition_in_db
@@ -299,6 +299,7 @@ def test_add_color_to_match(session = None):
     match = matches[0]
     print(match, match.color, match.color_hex)
     color = get_from_db("Color", "Orange", session)
+    print(color.matches)
     
     add_to_db(color, session)
     match.set_color(color)
@@ -435,20 +436,68 @@ def test_user_open_matches():
   
   with Session.begin() as session:
     user = get_all_db("User", session)[0]
-    user.matches[-1].winner = 0
-    user.matches[-2].winner = 0
-    match = user.matches[-3]
+    print(user.username)
+    a_matches = user.active_bets
+    print(a_matches)
+    matches = get_all_db("Match", session)
+    print(matches[-1].bets, matches[-2].bets, matches[-3].bets)
+    print(matches[-1].bets[0].user.username, matches[-2].bets[0].user.username, matches[-3].bets[0].user.username)
     
-    match.winner = 0
     
-    print(user.open_matches)
-    match.winner = 1
+    del_num = 0
+    match1 = matches[-1]
+    match1.winner = 0
+    match1.date_closed = None
+    for bet1 in match1.bets:
+      del_num += 1
+      bet1.winner = 0
+    match1_bet_user_ids = [bet.user_id for bet in match1.bets]
+    print(match1_bet_user_ids, user.code, user.code in match1_bet_user_ids)
+    print(type(match1_bet_user_ids), type(user.code), type(user.code in match1_bet_user_ids))
+    print(match1.code, match1.winner, match1.bets, user.code in match1_bet_user_ids)
     
-    print(match.winner)
+    match2 = matches[-2]
+    match2.winner = 0
+    match2.date_closed = None
+    for bet2 in match2.bets:
+      del_num += 1
+      #print("deleted", bet2.code)
+      delete_from_db(bet2, session=session)
+    session.flush()
+    session.expire_all()
+    match2_bet_user_ids = [bet.user_id for bet in match2.bets]
+    print(match2.code, match2.winner, match2.bets, user.code in match2_bet_user_ids)
     
-    session.flush([match])
+      
+    match3 = matches[-3]
+    match3.winner = 0
+    old_date = match3.date_closed
+    match3.date_closed = None
+    for bet3 in match3.bets:
+      del_num += 1
+      #print("deleted", bet3.code)
+      delete_from_db(bet3, session=session)
+    session.flush()
+    session.expire_all()
+    match3_bet_user_ids = [bet.user_id for bet in match3.bets]
+    print(match3.code, match3.winner, match3.bets, user.code in match3_bet_user_ids)
+    
+    print(f"init done", del_num)
+    bets = user.bets
+    match_ids = [bet.match_id for bet in bets]
+    
+    for open_match in user.open_matches(session):
+      print(open_match, open_match.code in match_ids)
+      
+    print(user.open_matches(session))
+    match3.winner = 1
+    match3.date_closed = old_date
+    
+    print(match3.winner)
+    
+    session.flush([match1, match2, match3])
     session.expire(user)
-    print(user.open_matches, "diff")
+    print(user.open_matches(session), "diff")
     
 def test_get_new_db():
   print("\ntest_get_new_db")
@@ -528,15 +577,17 @@ def test_parent_speeds():
     
     print(endTime - startTime)
   
-  
+
+test_user_open_matches()
+quit()
   
 
 test_get()
 test_get_mult()
 test_is_key_in_db()
-test_delete_match()
-test_delete_bet()
-test_delete_user()
+#test_delete_match()
+#test_delete_bet()
+#test_delete_user()
 test_relat_ctp()
 test_relat_ptc()
 test_relat_get_match()
